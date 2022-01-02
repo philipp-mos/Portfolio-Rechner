@@ -1,6 +1,10 @@
 {
     let portfolioData = {};
 
+
+    /**
+     * Load Portfolio Configuration from Json and save in variable
+     */
     const getPortfolioData = () => {
         const request = new XMLHttpRequest();
         request.open('GET', `data.json?v=${new Date().toLocaleString()}`, false);
@@ -12,6 +16,10 @@
     }
 
 
+    /**
+     * Initialize PortfolioResults and trigger Building the Entries
+     * @returns 
+     */
     const initPortfolioResults = () => {
         const portfolioResults = document.getElementById('portfolioresults');
 
@@ -23,8 +31,12 @@
     }
 
 
+    /**
+     * Calculate some general Values and trigger individual calculations
+     * @param {HTMLElement} portfolioResultsTable 
+     * @returns 
+     */
     const buildPortfolioResults = (portfolioResultsTable) => {
-        const tbodyElement = portfolioResultsTable.querySelectorAll('tbody')[0];
         let portfolioTotalAssets = 0;
         let portfolioTotalPercentage = 0;
 
@@ -49,6 +61,19 @@
             percentageError.classList.add('color--negative');
         }
 
+        calculateValuesAndTriggerBuildingRows(portfolioResultsTable, portfolioTotalAssets);
+    }
+
+
+    /**
+     * Individual Calculation and saving Values in global array
+     * Starts building single Table Rows
+     * @param {HTMLElement} portfolioResultsTable 
+     * @param {number} portfolioTotalAssets 
+     */
+    const calculateValuesAndTriggerBuildingRows = (portfolioResultsTable, portfolioTotalAssets) => {
+        const tbodyElement = portfolioResultsTable.querySelectorAll('tbody')[0];
+
         portfolioData.forEach((portfolioItem) => {
             portfolioItem.currentPercentage = (portfolioItem.currentValue / portfolioTotalAssets) * 100;
             portfolioItem.targetValue = portfolioTotalAssets * (portfolioItem.targetPercentage / 100);
@@ -65,6 +90,11 @@
     }
 
 
+    /**
+     * Build a Table Row for a single Portfolio-Item
+     * @param {HTMLElement} tbodyElement 
+     * @param {object} portfolioItem 
+     */
     const buildTableRow = (tbodyElement, portfolioItem) => {
         const row = tbodyElement.insertRow();
 
@@ -91,6 +121,11 @@
     }
 
 
+    /**
+     * Format a floating Number with decimals and return as localized string
+     * @param {number} value 
+     * @returns 
+     */
     const formatFloatingNumber = (value) => {
         value = Number.parseFloat(value);
 
