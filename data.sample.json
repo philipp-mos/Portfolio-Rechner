@@ -1,9 +1,16 @@
-[
-    {
-        "title": "string",
-        "broker": "string",
-        "priority": 0,
-        "currentValue": 0,
-        "targetPercentage": 0
-    }
-]
+{
+    "monthlySavingAmount": 0,
+    "monthlySavingDurationInYears": 0,
+    "monthlySavingYearlyInterest": 0,
+    "portfolioItems":
+    [
+        {
+            "title": "string",
+            "broker": "string",
+            "priority": 0,
+            "currentValue": 0,
+            "targetPercentage": 0,
+            "relevantForSavings": true
+        }
+    ]
+}

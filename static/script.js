@@ -12,13 +12,13 @@
 
         portfolioData = JSON.parse(request.responseText);
 
-        portfolioData.sort((a, b) => (a.priority > b.priority ? 1 : -1));
+        portfolioData.portfolioItems.sort((a, b) => (a.priority > b.priority ? 1 : -1));
     }
 
 
     /**
      * Initialize PortfolioResults and trigger Building the Entries
-     * @returns 
+     * @returns
      */
     const initPortfolioResults = () => {
         const portfolioResults = document.getElementById('portfolioresults');
@@ -33,14 +33,14 @@
 
     /**
      * Calculate some general Values and trigger individual calculations
-     * @param {HTMLElement} portfolioResultsTable 
-     * @returns 
+     * @param {HTMLElement} portfolioResultsTable
+     * @returns
      */
     const buildPortfolioResults = (portfolioResultsTable) => {
         let portfolioTotalAssets = 0;
         let portfolioTotalPercentage = 0;
 
-        portfolioData.forEach((portfolioItem) => {
+        portfolioData.portfolioItems.forEach((portfolioItem) => {
             portfolioTotalAssets += Number.parseFloat(portfolioItem.currentValue);
             portfolioTotalPercentage += Number.parseFloat(portfolioItem.targetPercentage);
         });
@@ -68,13 +68,13 @@
     /**
      * Individual Calculation and saving Values in global array
      * Starts building single Table Rows
-     * @param {HTMLElement} portfolioResultsTable 
-     * @param {number} portfolioTotalAssets 
+     * @param {HTMLElement} portfolioResultsTable
+     * @param {number} portfolioTotalAssets
      */
     const calculateValuesAndTriggerBuildingRows = (portfolioResultsTable, portfolioTotalAssets) => {
         const tbodyElement = portfolioResultsTable.querySelectorAll('tbody')[0];
 
-        portfolioData.forEach((portfolioItem) => {
+        portfolioData.portfolioItems.forEach((portfolioItem) => {
             portfolioItem.currentPercentage = (portfolioItem.currentValue / portfolioTotalAssets) * 100;
             portfolioItem.targetValue = portfolioTotalAssets * (portfolioItem.targetPercentage / 100);
             portfolioItem.changeValue = portfolioItem.targetValue - portfolioItem.currentValue;
@@ -92,8 +92,8 @@
 
     /**
      * Build a Table Row for a single Portfolio-Item
-     * @param {HTMLElement} tbodyElement 
-     * @param {object} portfolioItem 
+     * @param {HTMLElement} tbodyElement
+     * @param {object} portfolioItem
      */
     const buildTableRow = (tbodyElement, portfolioItem) => {
         const row = tbodyElement.insertRow();
@@ -112,7 +112,7 @@
         cell5.innerText = `${formatFloatingNumber(portfolioItem.targetValue)} €`;
         cell6.innerHTML = `${portfolioItem.changeValueText}`;
 
-        cell2.classList.add('text-left');
+        cell1.classList.add('text-left');
         cell2.classList.add('text-right');
         cell3.classList.add('text-right');
         cell4.classList.add('text-right');
@@ -121,10 +121,84 @@
     }
 
 
+    const initMonthlySavings = () => {
+        portfolioData.interestInitialAmount = 0;
+
+        portfolioData.portfolioItems.forEach((portfolioItem) => {
+            if (portfolioItem.relevantForSavings) {
+                portfolioData.interestInitialAmount += portfolioItem.currentValue;
+            }
+        });
+
+        document.getElementById('interest-initialamount').innerText = `${formatFloatingNumber(portfolioData.interestInitialAmount)} €`;
+        document.getElementById('interest-monthlysaving').innerText = `${formatFloatingNumber(portfolioData.monthlySavingAmount)} €`;
+        document.getElementById('interest-duration').innerText = `${portfolioData.monthlySavingDurationInYears} Jahre`;
+        document.getElementById('interest-yearlyinterest').innerText = `${formatFloatingNumber(portfolioData.monthlySavingYearlyInterest)} %`;
+
+
+        const interestoverviewTable = document.getElementById('interestoverview');
+        const tbodyElement = interestoverviewTable.querySelectorAll('tbody')[0];
+
+        let savedAmount = 0;
+        let totalInterests = 0;
+
+        for (let i = 1; i <= portfolioData.monthlySavingDurationInYears; i++) {
+            const row = tbodyElement.insertRow();
+
+            const cell1 = row.insertCell();
+            const cell2 = row.insertCell();
+            const cell3 = row.insertCell();
+            const cell4 = row.insertCell();
+
+            savedAmount += portfolioData.monthlySavingAmount * 12;
+
+            const savedAmountUntilNow = portfolioData.interestInitialAmount + savedAmount;
+
+            const compoundInterest = calculateCompoundInterest(
+                portfolioData.interestInitialAmount,
+                i,
+                portfolioData.monthlySavingYearlyInterest,
+                12
+            );
+            
+
+            cell1.innerText = `(${i}) ${new Date().getFullYear() + (i - 1)}`;
+            cell2.innerText = `${formatFloatingNumber(savedAmountUntilNow)} €`;
+            cell3.innerText = `${formatFloatingNumber(savedAmountUntilNow + totalInterests)} €`;
+            cell4.innerText = `${formatFloatingNumber(compoundInterest)} €`;
+
+            totalInterests += compoundInterest;
+
+            cell1.classList.add('text-center');
+            cell2.classList.add('text-right');
+            cell3.classList.add('text-right');
+            cell4.classList.add('text-right');
+        }
+    }
+
+    /**
+     *
+     * @param {number} p Principal Amount
+     * @param {number} t Time
+     * @param {number} r Annual Interest Rate
+     * @param {number} n Number of times compounded
+     * @returns
+     */
+    const calculateCompoundInterest = (p, t, r, n) => {
+        p = Number.parseFloat(p);
+        t = Number.parseFloat(t);
+        r = Number.parseFloat(r);
+        n = Number.parseFloat(n);
+
+        const amount = p * (Math.pow((1 + ((r / 100) / n)), (n * t)));
+        return amount - p;
+    }
+
+
     /**
      * Format a floating Number with decimals and return as localized string
-     * @param {number} value 
-     * @returns 
+     * @param {number} value
+     * @returns
      */
     const formatFloatingNumber = (value) => {
         value = Number.parseFloat(value);
@@ -141,4 +215,5 @@
 
     getPortfolioData();
     initPortfolioResults();
+    initMonthlySavings();
 }
