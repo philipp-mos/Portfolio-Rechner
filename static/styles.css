@@ -1,0 +1,33 @@
+.body {
+    font-family: 'Roboto', sans-serif;
+}
+
+.portfolio__item {
+    margin: 2rem 0;
+}
+
+.portfolio__item .formgroup {
+    margin: 1rem 0;
+}
+
+.input__label {
+    display: inline-block;
+    width: 8rem;
+}
+
+
+.text-right {
+    text-align: right;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+.color--positive {
+    color: #1dd1a1;
+}
+
+.color--negative {
+    color: #ee5253;
+}
