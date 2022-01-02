@@ -2,7 +2,8 @@
     {
         "title": "string",
         "broker": "string",
+        "priority": 0,
         "currentValue": 0,
-        "targetDivision": 0
+        "targetPercentage": 0
     }
 ]

@@ -10,6 +10,8 @@
         request.send(null);
 
         portfolioData = JSON.parse(request.responseText);
+
+        portfolioData.sort((a, b) => (a.priority > b.priority ? 1 : -1));
     }
 
 
@@ -25,13 +27,13 @@
 
 
     const buildPortfolioResults = (portfolioResultsTable) => {
-        const tbody = document.getElementsByTagName('tbody')[0];
+        const tbody = portfolioResultsTable.querySelectorAll('tbody')[0];
         let portfolioTotalAssets = 0;
         let portfolioTotalPercentage = 0;
 
         portfolioData.forEach((portfolioItem) => {
             portfolioTotalAssets += Number.parseFloat(portfolioItem.currentValue);
-            portfolioTotalPercentage += Number.parseFloat(portfolioItem.targetDivision);            
+            portfolioTotalPercentage += Number.parseFloat(portfolioItem.targetPercentage);            
         });
 
         const totalAssetsInfo = document.getElementById('portfoliototalassets');
@@ -52,18 +54,14 @@
 
 
         portfolioData.forEach((portfolioItem) => {
-            const currentPercentage = (portfolioItem.currentValue / portfolioTotalAssets) * 100;
-            const targetDivision = Number.parseFloat(portfolioItem.targetDivision);
+            portfolioItem.currentPercentage = (portfolioItem.currentValue / portfolioTotalAssets) * 100;
+            portfolioItem.targetValue = portfolioTotalAssets * (portfolioItem.targetPercentage / 100);
+            portfolioItem.changeValue = portfolioItem.targetValue - portfolioItem.currentValue;    
 
-            const currentValue = Number.parseFloat(portfolioItem.currentValue);
-            const targetValue = portfolioTotalAssets * (targetDivision / 100);
+            let changeValueText = `<span class="font-bold color--positive">Kauf: ${formatFloatingNumber(portfolioItem.changeValue)} €</span>`;
 
-            const changeValue = targetValue - currentValue;
-
-            let changeValueText = `<span class="font-bold color--positive">Kauf: ${formatFloatingNumber(changeValue)} €</span>`;
-
-            if (changeValue < 0) {
-                changeValueText = `<span class="font-bold color--negative">Verkauf: ${formatFloatingNumber(changeValue * -1)} €</span>`;
+            if (portfolioItem.changeValue < 0) {
+                changeValueText = `<span class="font-bold color--negative">Verkauf: ${formatFloatingNumber(portfolioItem.changeValue * -1)} €</span>`;
             }
 
             const row = tbody.insertRow();
@@ -76,10 +74,10 @@
             const cell6 = row.insertCell();
 
             cell1.innerHTML = `<span class="font-bold">${portfolioItem.title}</span><br />(${portfolioItem.broker})`;
-            cell2.innerText = `${formatFloatingNumber(currentPercentage)} %`;
-            cell3.innerText = `${formatFloatingNumber(currentValue)} €`;
-            cell4.innerText = `${formatFloatingNumber(targetDivision)} %`;
-            cell5.innerText = `${formatFloatingNumber(targetValue)} €`;
+            cell2.innerText = `${formatFloatingNumber(portfolioItem.currentPercentage)} %`;
+            cell3.innerText = `${formatFloatingNumber(portfolioItem.currentValue)} €`;
+            cell4.innerText = `${formatFloatingNumber(portfolioItem.targetPercentage)} %`;
+            cell5.innerText = `${formatFloatingNumber(portfolioItem.targetValue)} €`;
             cell6.innerHTML = `${changeValueText}`;
 
             cell2.classList.add('text-right');

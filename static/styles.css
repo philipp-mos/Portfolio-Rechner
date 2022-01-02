@@ -1,19 +1,13 @@
-.body {
+.portfolio {
     font-family: 'Roboto', sans-serif;
 }
 
-.portfolio__item {
-    margin: 2rem 0;
-}
-
-.portfolio__item .formgroup {
+.portfolio__section {
     margin: 1rem 0;
+    border-top: 1px solid #535c68;
 }
 
-.input__label {
-    display: inline-block;
-    width: 8rem;
-}
+
 
 
 .text-right {
