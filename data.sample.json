@@ -2,6 +2,7 @@
     "monthlySavingAmount": 0,
     "monthlySavingDurationInYears": 0,
     "monthlySavingYearlyInterest": 0,
+    "currentAge": 0,
     "portfolioItems":
     [
         {

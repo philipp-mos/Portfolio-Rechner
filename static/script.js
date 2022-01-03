@@ -136,11 +136,7 @@
         document.getElementById('interest-yearlyinterest').innerText = `${formatFloatingNumber(portfolioData.monthlySavingYearlyInterest)} %`;
 
 
-        const interestoverviewTable = document.getElementById('interestoverview');
-        const tbodyElement = interestoverviewTable.querySelectorAll('tbody')[0];
-
-        let savedAmount = 0;
-        let totalInterests = 0;
+        const tbodyElement = document.getElementById('interestoverview').querySelectorAll('tbody')[0];
 
         for (let i = 1; i <= portfolioData.monthlySavingDurationInYears; i++) {
             const row = tbodyElement.insertRow();
@@ -149,10 +145,9 @@
             const cell2 = row.insertCell();
             const cell3 = row.insertCell();
             const cell4 = row.insertCell();
+            const cell5 = row.insertCell();
 
-            savedAmount += portfolioData.monthlySavingAmount * 12;
-
-            const savedAmountUntilNow = portfolioData.interestInitialAmount + savedAmount;
+            let totalSavedAmount = (portfolioData.monthlySavingAmount * 12) * i;
 
             const compoundInterest = calculateCompoundInterest(
                 portfolioData.interestInitialAmount,
@@ -160,21 +155,21 @@
                 portfolioData.monthlySavingYearlyInterest,
                 12
             );
-            
 
-            cell1.innerText = `(${i}) ${new Date().getFullYear() + (i - 1)}`;
-            cell2.innerText = `${formatFloatingNumber(savedAmountUntilNow)} €`;
-            cell3.innerText = `${formatFloatingNumber(savedAmountUntilNow + totalInterests)} €`;
-            cell4.innerText = `${formatFloatingNumber(compoundInterest)} €`;
-
-            totalInterests += compoundInterest;
+            cell1.innerText = `(${i}) ${new Date().getFullYear() + (i - 1)} (Alter: ${portfolioData.currentAge + i})`;
+            cell2.innerText = `${formatFloatingNumber(portfolioData.monthlySavingAmount * 12)} €`;
+            cell3.innerText = `${formatFloatingNumber(totalSavedAmount + portfolioData.interestInitialAmount)} €`;
+            cell4.innerText = `${formatFloatingNumber(totalSavedAmount + compoundInterest + portfolioData.interestInitialAmount)} €`;
+            cell5.innerText = `${formatFloatingNumber(compoundInterest)} €`;
 
             cell1.classList.add('text-center');
             cell2.classList.add('text-right');
             cell3.classList.add('text-right');
             cell4.classList.add('text-right');
+            cell5.classList.add('text-right');
         }
     }
+
 
     /**
      *
@@ -190,8 +185,7 @@
         r = Number.parseFloat(r);
         n = Number.parseFloat(n);
 
-        const amount = p * (Math.pow((1 + ((r / 100) / n)), (n * t)));
-        return amount - p;
+        return (p * (Math.pow((1 + ((r / 100) / n)), (n * t))) - p);
     }
 
 
