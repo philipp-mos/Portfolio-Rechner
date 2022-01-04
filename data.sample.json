@@ -6,12 +6,22 @@
     "portfolioItems":
     [
         {
-            "title": "string",
-            "broker": "string",
+            "title": "",
+            "broker": "",
             "priority": 0,
             "currentValue": 0,
             "targetPercentage": 0,
-            "relevantForSavings": true
+            "relevantForSavings": false
+        }
+    ],
+    "exemptionOrderMaxValue": 0,
+    "exemptionOrders":
+    [
+        {
+            "title": "",
+            "amount": 0,
+            "alreadyUsed": 0
         }
     ]
+
 }

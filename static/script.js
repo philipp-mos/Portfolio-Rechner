@@ -170,6 +170,53 @@
         }
     }
 
+    const initExemptionOrders = () => {
+        const tbodyElement = document.getElementById('exemptionordertable').querySelectorAll('tbody')[0];
+
+        let totalAmount = 0;
+        let alreadyUsed = 0;
+
+        portfolioData.exemptionOrders.forEach((exemptionOrder) => {
+            totalAmount += exemptionOrder.amount;
+            alreadyUsed += exemptionOrder.alreadyUsed;
+
+            const row = tbodyElement.insertRow();
+
+            const cell1 = row.insertCell();
+            const cell2 = row.insertCell();
+            const cell3 = row.insertCell();
+            const cell4 = row.insertCell();
+
+            const available = exemptionOrder.amount - exemptionOrder.alreadyUsed;
+
+            cell1.innerText = exemptionOrder.title;
+            cell2.innerText = `${formatFloatingNumber(exemptionOrder.amount)} €`;
+            cell3.innerText = `${formatFloatingNumber(exemptionOrder.alreadyUsed)} €`;
+            cell4.innerText = `${formatFloatingNumber(available)} €`;
+
+            cell2.classList.add('text-right');
+            cell3.classList.add('text-right');
+            cell4.classList.add('text-right');
+
+            if (available < 0) {
+                cell4.classList.add('color--negative');
+            }
+            else if (available > 0 && available < 25) {
+                cell4.classList.add('color--neutral');
+            }
+        });
+
+        const totalAmountElement = document.getElementById('exemptionorder-totalamount');
+        totalAmountElement.innerText = `${formatFloatingNumber(totalAmount)} €`;
+
+        if (totalAmount > portfolioData.exemptionOrderMaxValue) {
+            totalAmountElement.classList.add('color--negative');
+        }
+
+        document.getElementById('exemptionorder-alreadyused').innerText = `${formatFloatingNumber(alreadyUsed)} €`;
+        document.getElementById('exemptionorder-available').innerText = `${formatFloatingNumber(totalAmount - alreadyUsed)} €`;
+    }
+
 
     /**
      *
@@ -209,5 +256,6 @@
 
     getPortfolioData();
     initPortfolioResults();
+    initExemptionOrders();
     initMonthlySavings();
 }
