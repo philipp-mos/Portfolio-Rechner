@@ -170,6 +170,7 @@
         }
     }
 
+
     const initExemptionOrders = () => {
         const tbodyElement = document.getElementById('exemptionordertable').querySelectorAll('tbody')[0];
 
@@ -213,8 +214,19 @@
             totalAmountElement.classList.add('color--negative');
         }
 
-        document.getElementById('exemptionorder-alreadyused').innerText = `${formatFloatingNumber(alreadyUsed)} €`;
-        document.getElementById('exemptionorder-available').innerText = `${formatFloatingNumber(totalAmount - alreadyUsed)} €`;
+        const alreadyUsedElement = document.getElementById('exemptionorder-alreadyused');
+        alreadyUsedElement.innerText = `${formatFloatingNumber(alreadyUsed)} €`;
+
+        if (alreadyUsed > portfolioData.exemptionOrderMaxValue) {
+            alreadyUsedElement.classList.add('color--negative');
+        }
+        
+        const availableElement = document.getElementById('exemptionorder-available');
+        availableElement.innerText = `${formatFloatingNumber(totalAmount - alreadyUsed)} €`;
+
+        if ((totalAmount - alreadyUsed) < 0) {
+            availableElement.classList.add('color--negative');
+        }
     }
 
 
