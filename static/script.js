@@ -12,7 +12,7 @@
 
         portfolioData = JSON.parse(request.responseText);
 
-        portfolioData.portfolioItems.sort((a, b) => (a.priority > b.priority ? 1 : -1));
+        portfolioData.portfolioItems.sort((a, b) => (a.targetPercentage < b.targetPercentage ? 1 : -1));
     }
 
 
@@ -104,13 +104,24 @@
         const cell4 = row.insertCell();
         const cell5 = row.insertCell();
         const cell6 = row.insertCell();
+        const cell7 = row.insertCell();
 
-        cell1.innerHTML = `<span class="font-bold">${portfolioItem.title}</span><br />(${portfolioItem.broker})`;
+        cell1.innerHTML = `<span class="font-bold">${portfolioItem.title}</span><br />(${getDepotOrAccountTitleById(portfolioItem.depotOrAccountId)})`;
         cell2.innerText = `${formatFloatingNumber(portfolioItem.currentPercentage)} %`;
         cell3.innerText = `${formatFloatingNumber(portfolioItem.currentValue)} €`;
         cell4.innerText = `${formatFloatingNumber(portfolioItem.targetPercentage)} %`;
         cell5.innerText = `${formatFloatingNumber(portfolioItem.targetValue)} €`;
         cell6.innerHTML = `${portfolioItem.changeValueText}`;
+
+        if (portfolioItem.descriptionItems !== null && portfolioItem.descriptionItems !== undefined) {
+            cell7.innerHTML = '<ul>';
+
+            portfolioItem.descriptionItems.forEach((descriptionItem) => {
+                cell7.innerHTML += `<li>${descriptionItem}</li>`;
+            });
+
+            cell7.innerHTML += '<ul>';
+        }
 
         cell1.classList.add('text-left');
         cell2.classList.add('text-right');
@@ -118,6 +129,25 @@
         cell4.classList.add('text-right');
         cell5.classList.add('text-right');
         cell6.classList.add('text-right');
+    }
+
+    
+    /**
+     * Find a DepotOrAccount and return Title
+     * @param {object} depotOrAccountId 
+     * @returns 
+     */
+    const getDepotOrAccountTitleById = (depotOrAccountId) => {
+
+        const depotOrAccount =  portfolioData.depotsOrAccounts.find(
+            ({ id }) => id === depotOrAccountId
+        );
+
+        if (depotOrAccount === null) {
+            return '-';
+        }
+
+        return depotOrAccount.title;
     }
 
 
@@ -177,7 +207,13 @@
         let totalAmount = 0;
         let alreadyUsed = 0;
 
-        portfolioData.exemptionOrders.forEach((exemptionOrder) => {
+        portfolioData.depotsOrAccounts.forEach((depotOrAccount) => {
+            const exemptionOrder = depotOrAccount.exemptionOrder;
+
+            if (exemptionOrder === null || exemptionOrder === undefined) {
+                return;
+            }
+
             totalAmount += exemptionOrder.amount;
             alreadyUsed += exemptionOrder.alreadyUsed;
 
@@ -190,7 +226,7 @@
 
             const available = exemptionOrder.amount - exemptionOrder.alreadyUsed;
 
-            cell1.innerText = exemptionOrder.title;
+            cell1.innerText = depotOrAccount.title;
             cell2.innerText = `${formatFloatingNumber(exemptionOrder.amount)} €`;
             cell3.innerText = `${formatFloatingNumber(exemptionOrder.alreadyUsed)} €`;
             cell4.innerText = `${formatFloatingNumber(available)} €`;

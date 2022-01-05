@@ -7,7 +7,12 @@
     [
         {
             "title": "",
-            "broker": "",
+            "descriptionItems":
+            [
+                "",
+                ""
+            ],
+            "depotOrAccountId": 1,
             "priority": 0,
             "currentValue": 0,
             "targetPercentage": 0,
@@ -15,12 +20,16 @@
         }
     ],
     "exemptionOrderMaxValue": 0,
-    "exemptionOrders":
+    "depotsOrAccounts":
     [
         {
+            "id": 1,
             "title": "",
-            "amount": 0,
-            "alreadyUsed": 0
+            "exemptionOrder":
+            {
+                "amount": 0,
+                "alreadyUsed": 0
+            }
         }
     ]
 
