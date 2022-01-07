@@ -74,6 +74,8 @@
     const calculateValuesAndTriggerBuildingRows = (portfolioResultsTable, portfolioTotalAssets) => {
         const tbodyElement = portfolioResultsTable.querySelectorAll('tbody')[0];
 
+        portfolioData.monthlySavings = 0;
+
         portfolioData.portfolioItems.forEach((portfolioItem) => {
             portfolioItem.currentPercentage = (portfolioItem.currentValue / portfolioTotalAssets) * 100;
             portfolioItem.targetValue = portfolioTotalAssets * (portfolioItem.targetPercentage / 100);
@@ -105,6 +107,7 @@
         const cell5 = row.insertCell();
         const cell6 = row.insertCell();
         const cell7 = row.insertCell();
+        const cell8 = row.insertCell();
 
         cell1.innerHTML = `<span class="font-bold">${portfolioItem.title}</span><br />(${getDepotOrAccountTitleById(portfolioItem.depotOrAccountId)})`;
         cell2.innerText = `${formatFloatingNumber(portfolioItem.currentPercentage)} %`;
@@ -113,14 +116,23 @@
         cell5.innerText = `${formatFloatingNumber(portfolioItem.targetValue)} €`;
         cell6.innerHTML = `${portfolioItem.changeValueText}`;
 
+        if (portfolioItem.monthlySavings !== null && portfolioItem.monthlySavings !== undefined) {
+            portfolioData.monthlySavings += portfolioItem.monthlySavings;
+            cell7.innerText = `${formatFloatingNumber(portfolioItem.monthlySavings)} €`;
+        }
+        else {
+            cell7.innerText = `${formatFloatingNumber(0)} €`;
+        }
+        
+
         if (portfolioItem.descriptionItems !== null && portfolioItem.descriptionItems !== undefined) {
-            cell7.innerHTML = '<ul>';
+            cell8.innerHTML = '<ul>';
 
             portfolioItem.descriptionItems.forEach((descriptionItem) => {
-                cell7.innerHTML += `<li>${descriptionItem}</li>`;
+                cell8.innerHTML += `<li>${descriptionItem}</li>`;
             });
 
-            cell7.innerHTML += '<ul>';
+            cell8.innerHTML += '<ul>';
         }
 
         cell1.classList.add('text-left');
@@ -129,6 +141,7 @@
         cell4.classList.add('text-right');
         cell5.classList.add('text-right');
         cell6.classList.add('text-right');
+        cell7.classList.add('text-right');
     }
 
     
@@ -161,7 +174,7 @@
         });
 
         document.getElementById('interest-initialamount').innerText = `${formatFloatingNumber(portfolioData.interestInitialAmount)} €`;
-        document.getElementById('interest-monthlysaving').innerText = `${formatFloatingNumber(portfolioData.monthlySavingAmount)} €`;
+        document.getElementById('interest-monthlysaving').innerText = `${formatFloatingNumber(portfolioData.monthlySavings)} €`;
         document.getElementById('interest-duration').innerText = `${portfolioData.monthlySavingDurationInYears} Jahre`;
         document.getElementById('interest-yearlyinterest').innerText = `${formatFloatingNumber(portfolioData.monthlySavingYearlyInterest)} %`;
 
@@ -177,7 +190,7 @@
             const cell4 = row.insertCell();
             const cell5 = row.insertCell();
 
-            let totalSavedAmount = (portfolioData.monthlySavingAmount * 12) * i;
+            let totalSavedAmount = (portfolioData.monthlySavings * 12) * i;
 
             const compoundInterest = calculateCompoundInterest(
                 portfolioData.interestInitialAmount,
@@ -186,8 +199,8 @@
                 12
             );
 
-            cell1.innerText = `(${i}) ${new Date().getFullYear() + (i - 1)} (Alter: ${portfolioData.currentAge + i})`;
-            cell2.innerText = `${formatFloatingNumber(portfolioData.monthlySavingAmount * 12)} €`;
+            cell1.innerHTML = `(${i}) <strong>${new Date().getFullYear() + (i - 1)}</strong> (Alter: ${portfolioData.currentAge + i})`;
+            cell2.innerText = `${formatFloatingNumber(portfolioData.monthlySavings * 12)} €`;
             cell3.innerText = `${formatFloatingNumber(totalSavedAmount + portfolioData.interestInitialAmount)} €`;
             cell4.innerText = `${formatFloatingNumber(totalSavedAmount + compoundInterest + portfolioData.interestInitialAmount)} €`;
             cell5.innerText = `${formatFloatingNumber(compoundInterest)} €`;
