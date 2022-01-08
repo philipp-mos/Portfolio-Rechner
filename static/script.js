@@ -200,16 +200,8 @@
         let totalCompoudInterest = 0;
         let finalValue = 0;
 
-        for (let i = 1; i <= portfolioData.monthlySavingDurationInYears; i++) {
-            const row = tbodyElement.insertRow();
-
-            const cell1 = row.insertCell();
-            const cell2 = row.insertCell();
-            const cell3 = row.insertCell();
-            const cell4 = row.insertCell();
-            const cell5 = row.insertCell();
-
-            let totalSavedAmount = portfolioData.interestInitialAmount + (portfolioData.monthlySavings * 12) * i;
+        for (let i = 1; i <= (portfolioData.monthlySavingDurationInYears + 1); i++) {
+            let totalSavedAmount = portfolioData.interestInitialAmount + ((portfolioData.monthlySavings * 12) * (i - 1));
             const totalBaseValue = totalSavedAmount + totalCompoudInterest;
 
             const compoundInterest = calculateCompoundInterest(
@@ -222,6 +214,18 @@
             totalCompoudInterest += compoundInterest;
 
             finalValue = totalBaseValue;
+
+            if (portfolioData.monthlySavingDurationInYears < i) {
+                continue;
+            }
+
+            const row = tbodyElement.insertRow();
+
+            const cell1 = row.insertCell();
+            const cell2 = row.insertCell();
+            const cell3 = row.insertCell();
+            const cell4 = row.insertCell();
+            const cell5 = row.insertCell();
 
             cell1.innerHTML = `(${i}) <strong>${new Date().getFullYear() + (i - 1)}</strong> (Alter: ${portfolioData.currentAge + i})`;
             cell2.innerText = `${formatFloatingNumber(portfolioData.monthlySavings * 12)} €`;
