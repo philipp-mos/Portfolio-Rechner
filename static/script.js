@@ -75,16 +75,25 @@
         const tbodyElement = portfolioResultsTable.querySelectorAll('tbody')[0];
 
         portfolioData.monthlySavings = 0;
+        portfolioData.interestInitialAmount = 0;
 
         portfolioData.portfolioItems.forEach((portfolioItem) => {
             portfolioItem.currentPercentage = (portfolioItem.currentValue / portfolioTotalAssets) * 100;
             portfolioItem.targetValue = portfolioTotalAssets * (portfolioItem.targetPercentage / 100);
             portfolioItem.changeValue = portfolioItem.targetValue - portfolioItem.currentValue;
 
-            portfolioItem.changeValueText = `<span class="font-bold color--positive">Kauf: ${formatFloatingNumber(portfolioItem.changeValue)} €</span>`;
 
-            if (portfolioItem.changeValue < 0) {
-                portfolioItem.changeValueText = `<span class="font-bold color--negative">Verkauf: ${formatFloatingNumber(portfolioItem.changeValue * -1)} €</span>`;
+            if (portfolioItem.changeValue > 0) {
+                portfolioItem.changeValueText = `<span class="font-bold color--positive">Buy: ${formatFloatingNumber(portfolioItem.changeValue)} €</span>`;
+            }
+            else if (portfolioItem.changeValue < 0 && portfolioItem.changeValue > portfolioData.rebalancingNegativeHoldDelay) {
+                portfolioItem.changeValueText = `<span class="font-bold color--neutral">Hold: (${formatFloatingNumber(portfolioItem.changeValue)} €)</span>`;
+            }
+            else if (portfolioItem.changeValue < 0) {
+                portfolioItem.changeValueText = `<span class="font-bold color--negative">Sell: ${formatFloatingNumber(portfolioItem.changeValue * -1)} €</span>`;
+            }
+            else {
+                portfolioItem.changeValueText = '-';
             }
 
             buildTableRow(tbodyElement, portfolioItem);
@@ -108,6 +117,7 @@
         const cell6 = row.insertCell();
         const cell7 = row.insertCell();
         const cell8 = row.insertCell();
+        const cell9 = row.insertCell();
 
         cell1.innerHTML = `<span class="font-bold">${portfolioItem.title}</span><br />(${getDepotOrAccountTitleById(portfolioItem.depotOrAccountId)})`;
         cell2.innerText = `${formatFloatingNumber(portfolioItem.currentPercentage)} %`;
@@ -123,16 +133,28 @@
         else {
             cell7.innerText = `${formatFloatingNumber(0)} €`;
         }
+
+        if (portfolioItem.relevantForSavings !== null && portfolioItem.relevantForSavings !== undefined) {
+            if (portfolioItem.relevantForSavings) {
+                portfolioData.interestInitialAmount += portfolioItem.currentValue;
+                cell8.innerHTML = '&#10003;';
+                cell8.classList.add('color--positive');
+            }
+            else {
+                cell8.innerHTML = '&#10005;';
+                cell8.classList.add('color--negative');
+            }
+        }
         
 
         if (portfolioItem.descriptionItems !== null && portfolioItem.descriptionItems !== undefined) {
-            cell8.innerHTML = '<ul>';
+            cell9.innerHTML = '<ul>';
 
             portfolioItem.descriptionItems.forEach((descriptionItem) => {
-                cell8.innerHTML += `<li>${descriptionItem}</li>`;
+                cell9.innerHTML += `<li>${descriptionItem}</li>`;
             });
 
-            cell8.innerHTML += '<ul>';
+            cell9.innerHTML += '<ul>';
         }
 
         cell1.classList.add('text-left');
@@ -142,6 +164,7 @@
         cell5.classList.add('text-right');
         cell6.classList.add('text-right');
         cell7.classList.add('text-right');
+        cell8.classList.add('text-center');
     }
 
     
@@ -165,13 +188,7 @@
 
 
     const initMonthlySavings = () => {
-        portfolioData.interestInitialAmount = 0;
-
-        portfolioData.portfolioItems.forEach((portfolioItem) => {
-            if (portfolioItem.relevantForSavings) {
-                portfolioData.interestInitialAmount += portfolioItem.currentValue;
-            }
-        });
+        calculateRemainingSavingTimeInYears();
 
         document.getElementById('interest-initialamount').innerText = `${formatFloatingNumber(portfolioData.interestInitialAmount)} €`;
         document.getElementById('interest-monthlysaving').innerText = `${formatFloatingNumber(portfolioData.monthlySavings)} €`;
@@ -180,6 +197,8 @@
 
 
         const tbodyElement = document.getElementById('interestoverview').querySelectorAll('tbody')[0];
+        let totalCompoudInterest = 0;
+        let finalValue = 0;
 
         for (let i = 1; i <= portfolioData.monthlySavingDurationInYears; i++) {
             const row = tbodyElement.insertRow();
@@ -190,19 +209,24 @@
             const cell4 = row.insertCell();
             const cell5 = row.insertCell();
 
-            let totalSavedAmount = (portfolioData.monthlySavings * 12) * i;
+            let totalSavedAmount = portfolioData.interestInitialAmount + (portfolioData.monthlySavings * 12) * i;
+            const totalBaseValue = totalSavedAmount + totalCompoudInterest;
 
             const compoundInterest = calculateCompoundInterest(
-                portfolioData.interestInitialAmount,
-                i,
+                totalBaseValue,
+                1,
                 portfolioData.monthlySavingYearlyInterest,
                 12
             );
 
+            totalCompoudInterest += compoundInterest;
+
+            finalValue = totalBaseValue;
+
             cell1.innerHTML = `(${i}) <strong>${new Date().getFullYear() + (i - 1)}</strong> (Alter: ${portfolioData.currentAge + i})`;
             cell2.innerText = `${formatFloatingNumber(portfolioData.monthlySavings * 12)} €`;
-            cell3.innerText = `${formatFloatingNumber(totalSavedAmount + portfolioData.interestInitialAmount)} €`;
-            cell4.innerText = `${formatFloatingNumber(totalSavedAmount + compoundInterest + portfolioData.interestInitialAmount)} €`;
+            cell3.innerText = `${formatFloatingNumber(totalSavedAmount)} €`;
+            cell4.innerText = `${formatFloatingNumber(totalBaseValue)} €`;
             cell5.innerText = `${formatFloatingNumber(compoundInterest)} €`;
 
             cell1.classList.add('text-center');
@@ -211,6 +235,11 @@
             cell4.classList.add('text-right');
             cell5.classList.add('text-right');
         }
+
+        document.getElementById('interest-finalvalue').innerText = `${formatFloatingNumber(finalValue)} €`;
+        document.getElementById('interest-totalsaved').innerText = `${formatFloatingNumber(portfolioData.interestInitialAmount + (portfolioData.monthlySavings * 12) * portfolioData.monthlySavingDurationInYears)} €`;
+        document.getElementById('interest-totalinterests').innerText = `${formatFloatingNumber(totalCompoudInterest)} €`;
+
     }
 
 
@@ -279,6 +308,12 @@
     }
 
 
+    const calculateRemainingSavingTimeInYears = () => {
+        portfolioData.currentAge = new Date().getFullYear() - portfolioData.birthYear - 1
+        portfolioData.monthlySavingDurationInYears = portfolioData.finalAge - portfolioData.currentAge;
+    }
+
+
     /**
      *
      * @param {number} p Principal Amount
@@ -293,7 +328,7 @@
         r = Number.parseFloat(r);
         n = Number.parseFloat(n);
 
-        return (p * (Math.pow((1 + ((r / 100) / n)), (n * t))) - p);
+        return (p * (Math.pow((1 + ((r / 100) / n)), (n * t)))) - p;
     }
 
 

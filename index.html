@@ -32,20 +32,22 @@
                             <col width="150">
                             <col width="150">
                             <col width="150">
+                            <col width="215">
                             <col width="200">
-                            <col width="200">
+                            <col width="100">
                             <col width="350">
                         </colgroup>
                         <thead>
                             <tr>
                                 <th>Position</th>
-                                <th>Aktueller Anteil</th>
-                                <th>Aktueller Wert</th>
-                                <th>Ziel Anteil</th>
-                                <th>Ziel Wert</th>
-                                <th>Todo</th>
-                                <th>Sparbetrag</th>
-                                <th>Beschreibung</th>
+                                <th class="text-right">Aktueller Anteil</th>
+                                <th class="text-right">Aktueller Wert</th>
+                                <th class="text-right">Ziel Anteil</th>
+                                <th class="text-right">Ziel Wert</th>
+                                <th class="text-right">Todo</th>
+                                <th class="text-right">Sparbetrag</th>
+                                <th class="text-right">Relevant</th>
+                                <th class="text-right">Beschreibung</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -82,10 +84,14 @@
             <div class="row">
                 <div class="col-12">
                     <h3>Zinseszins:</h3>
-                    <div>Anfangskapital: <span id="interest-initialamount"></span></div>
-                    <div>Monatliche Sparrate: <span id="interest-monthlysaving"></span></div>
-                    <div>Spardauer: <span id="interest-duration"></span></div>
-                    <div>Jährlicher Zinssatz: <span id="interest-yearlyinterest"></span></div>
+                    <div><span class="font-bold">Anfangskapital:</span> <span id="interest-initialamount"></span></div>
+                    <div><span class="font-bold">Monatliche Sparrate:</span> <span id="interest-monthlysaving"></span></div>
+                    <div><span class="font-bold">Verbleibende Spardauer:</span> <span id="interest-duration"></span></div>
+                    <div><span class="font-bold">Jährlicher Zinssatz:</span> <span id="interest-yearlyinterest"></span></div>
+                    <br />
+                    <div><span class="font-bold">Finaler Wert:</span> <span id="interest-finalvalue"></span></div>
+                    <div><span class="font-bold">Gespart Gesamt:</span> <span id="interest-totalsaved"></span></div>
+                    <div><span class="font-bold">Zinsen Gesamt:</span> <span id="interest-totalinterests"></span></div>
                     <table id="interestoverview" class="table table-striped table-responsive">
                         <colgroup>
                             <col width="155">
@@ -97,7 +103,7 @@
                         <thead>
                             <tr>
                                 <th>Jahr</th>
-                                <th>Sparbetrag</th>
+                                <th>Sparbetrag (jährlich)</th>
                                 <th>Einbezahlter Betrag</th>
                                 <th>Gesamtbetrag</th>
                                 <th>Zinsgutschrift</th>
