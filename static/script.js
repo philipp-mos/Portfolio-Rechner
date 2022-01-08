@@ -48,16 +48,13 @@
         const totalAssetsInfo = document.getElementById('portfoliototalassets');
         totalAssetsInfo.innerText = `${formatFloatingNumber(portfolioTotalAssets)} €`;
 
-        const totalPercentageInfo = document.getElementById('portfoliototalpercentage');
-        totalPercentageInfo.innerText = `${formatFloatingNumber(portfolioTotalPercentage)} %`;
-
         if (portfolioTotalAssets === 0) {
             return;
         }
 
-        if (portfolioTotalPercentage > 100) {
+        if (portfolioTotalPercentage !== 100) {
             const percentageError = document.getElementById('portfoliopercentageerror');
-            percentageError.innerText = `Gesamtprozentzahl reduzieren (${formatFloatingNumber(portfolioTotalPercentage)} %)`;
+            percentageError.innerText = `Gesamtprozentzahl anpassen (${formatFloatingNumber(portfolioTotalPercentage)} %)`;
             percentageError.classList.add('color--negative');
         }
 
@@ -126,26 +123,28 @@
         cell5.innerText = `${formatFloatingNumber(portfolioItem.targetValue)} €`;
         cell6.innerHTML = `${portfolioItem.changeValueText}`;
 
+        const isRelevantForSaving = (portfolioItem.relevantForSavings !== null && portfolioItem.relevantForSavings !== undefined) && portfolioItem.relevantForSavings;
+
         if (portfolioItem.monthlySavings !== null && portfolioItem.monthlySavings !== undefined) {
-            portfolioData.monthlySavings += portfolioItem.monthlySavings;
+            if (isRelevantForSaving) {
+                portfolioData.monthlySavings += portfolioItem.monthlySavings;
+            }
             cell7.innerText = `${formatFloatingNumber(portfolioItem.monthlySavings)} €`;
         }
         else {
             cell7.innerText = `${formatFloatingNumber(0)} €`;
         }
 
-        if (portfolioItem.relevantForSavings !== null && portfolioItem.relevantForSavings !== undefined) {
-            if (portfolioItem.relevantForSavings) {
+        if (isRelevantForSaving) {
                 portfolioData.interestInitialAmount += portfolioItem.currentValue;
                 cell8.innerHTML = '&#10003;';
                 cell8.classList.add('color--positive');
-            }
-            else {
-                cell8.innerHTML = '&#10005;';
-                cell8.classList.add('color--negative');
-            }
         }
-        
+        else {
+            cell8.innerHTML = '&#10005;';
+            cell8.classList.add('color--negative');
+        }
+
 
         if (portfolioItem.descriptionItems !== null && portfolioItem.descriptionItems !== undefined) {
             cell9.innerHTML = '<ul>';
@@ -167,11 +166,11 @@
         cell8.classList.add('text-center');
     }
 
-    
+
     /**
      * Find a DepotOrAccount and return Title
-     * @param {object} depotOrAccountId 
-     * @returns 
+     * @param {object} depotOrAccountId
+     * @returns
      */
     const getDepotOrAccountTitleById = (depotOrAccountId) => {
 
@@ -233,7 +232,7 @@
             cell4.innerText = `${formatFloatingNumber(totalBaseValue)} €`;
             cell5.innerText = `${formatFloatingNumber(compoundInterest)} €`;
 
-            cell1.classList.add('text-center');
+            cell1.classList.add('text-left');
             cell2.classList.add('text-right');
             cell3.classList.add('text-right');
             cell4.classList.add('text-right');
@@ -302,9 +301,9 @@
         if (alreadyUsed > portfolioData.exemptionOrderMaxValue) {
             alreadyUsedElement.classList.add('color--negative');
         }
-        
+
         const availableElement = document.getElementById('exemptionorder-available');
-        availableElement.innerText = `${formatFloatingNumber(totalAmount - alreadyUsed)} €`;
+        availableElement.innerText = `${formatFloatingNumber(portfolioData.exemptionOrderMaxValue - alreadyUsed)} €`;
 
         if ((totalAmount - alreadyUsed) < 0) {
             availableElement.classList.add('color--negative');
