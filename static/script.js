@@ -81,13 +81,13 @@
 
 
             if (portfolioItem.changeValue > 0) {
-                portfolioItem.changeValueText = `<span class="font-bold color--positive">Buy: ${formatFloatingNumber(portfolioItem.changeValue)} €</span>`;
+                portfolioItem.changeValueText = `<span class="badge bg-success fw-bold">Buy: ${formatFloatingNumber(portfolioItem.changeValue)} €</span>`;
             }
             else if (portfolioItem.changeValue < 0 && portfolioItem.changeValue > portfolioData.rebalancingNegativeHoldDelay) {
-                portfolioItem.changeValueText = `<span class="font-bold color--neutral">Hold: (${formatFloatingNumber(portfolioItem.changeValue)} €)</span>`;
+                portfolioItem.changeValueText = `<span class="badge bg-warning fw-bold text-dark">Hold: (${formatFloatingNumber(portfolioItem.changeValue)} €)</span>`;
             }
             else if (portfolioItem.changeValue < 0) {
-                portfolioItem.changeValueText = `<span class="font-bold color--negative">Sell: ${formatFloatingNumber(portfolioItem.changeValue * -1)} €</span>`;
+                portfolioItem.changeValueText = `<span class="badge bg-danger fw-bold">Sell: ${formatFloatingNumber(portfolioItem.changeValue * -1)} €</span>`;
             }
             else {
                 portfolioItem.changeValueText = '-';
@@ -116,7 +116,7 @@
         const cell8 = row.insertCell();
         const cell9 = row.insertCell();
 
-        cell1.innerHTML = `<span class="font-bold">${portfolioItem.title}</span><br />(${getDepotOrAccountTitleById(portfolioItem.depotOrAccountId)})`;
+        cell1.innerHTML = `<span class="fw-bold">${portfolioItem.title}</span><br />(${getDepotOrAccountTitleById(portfolioItem.depotOrAccountId)})`;
         cell2.innerText = `${formatFloatingNumber(portfolioItem.currentPercentage)} %`;
         cell3.innerText = `${formatFloatingNumber(portfolioItem.currentValue)} €`;
         cell4.innerText = `${formatFloatingNumber(portfolioItem.targetPercentage)} %`;
@@ -138,31 +138,29 @@
         if (isRelevantForSaving) {
                 portfolioData.interestInitialAmount += portfolioItem.currentValue;
                 cell8.innerHTML = '&#10003;';
-                cell8.classList.add('color--positive');
+                cell8.classList.add('text-success');
         }
         else {
             cell8.innerHTML = '&#10005;';
-            cell8.classList.add('color--negative');
+            cell8.classList.add('text-danger');
         }
 
 
         if (portfolioItem.descriptionItems !== null && portfolioItem.descriptionItems !== undefined) {
-            cell9.innerHTML = '<ul>';
 
             portfolioItem.descriptionItems.forEach((descriptionItem) => {
-                cell9.innerHTML += `<li>${descriptionItem}</li>`;
+                cell9.innerHTML += `<div class="badge bg-secondary me-2">${descriptionItem}</div>`;
             });
 
-            cell9.innerHTML += '<ul>';
         }
 
-        cell1.classList.add('text-left');
-        cell2.classList.add('text-right');
-        cell3.classList.add('text-right');
-        cell4.classList.add('text-right');
-        cell5.classList.add('text-right');
-        cell6.classList.add('text-right');
-        cell7.classList.add('text-right');
+        cell1.classList.add('text-start');
+        cell2.classList.add('text-end');
+        cell3.classList.add('text-end');
+        cell4.classList.add('text-end');
+        cell5.classList.add('text-end');
+        cell6.classList.add('text-end');
+        cell7.classList.add('text-end');
         cell8.classList.add('text-center');
     }
 
@@ -232,11 +230,11 @@
             cell4.innerText = `${formatFloatingNumber(totalBaseValue)} €`;
             cell5.innerText = `${formatFloatingNumber(compoundInterest)} €`;
 
-            cell1.classList.add('text-left');
-            cell2.classList.add('text-right');
-            cell3.classList.add('text-right');
-            cell4.classList.add('text-right');
-            cell5.classList.add('text-right');
+            cell1.classList.add('text-start');
+            cell2.classList.add('text-end');
+            cell3.classList.add('text-end');
+            cell4.classList.add('text-end');
+            cell5.classList.add('text-end');
         }
 
         document.getElementById('interest-finalvalue').innerText = `${formatFloatingNumber(finalValue)} €`;
@@ -276,15 +274,15 @@
             cell3.innerText = `${formatFloatingNumber(exemptionOrder.alreadyUsed)} €`;
             cell4.innerText = `${formatFloatingNumber(available)} €`;
 
-            cell2.classList.add('text-right');
-            cell3.classList.add('text-right');
-            cell4.classList.add('text-right');
+            cell2.classList.add('text-end');
+            cell3.classList.add('text-end');
+            cell4.classList.add('text-end');
 
             if (available < 0) {
-                cell4.classList.add('color--negative');
+                cell4.classList.add('text-danger');
             }
             else if (available > 0 && available < 25) {
-                cell4.classList.add('color--neutral');
+                cell4.classList.add('text-warning');
             }
         });
 
@@ -292,21 +290,21 @@
         totalAmountElement.innerText = `${formatFloatingNumber(totalAmount)} €`;
 
         if (totalAmount > portfolioData.exemptionOrderMaxValue) {
-            totalAmountElement.classList.add('color--negative');
+            totalAmountElement.classList.add('text-danger');
         }
 
         const alreadyUsedElement = document.getElementById('exemptionorder-alreadyused');
         alreadyUsedElement.innerText = `${formatFloatingNumber(alreadyUsed)} €`;
 
         if (alreadyUsed > portfolioData.exemptionOrderMaxValue) {
-            alreadyUsedElement.classList.add('color--negative');
+            alreadyUsedElement.classList.add('text-danger');
         }
 
         const availableElement = document.getElementById('exemptionorder-available');
         availableElement.innerText = `${formatFloatingNumber(portfolioData.exemptionOrderMaxValue - alreadyUsed)} €`;
 
         if ((totalAmount - alreadyUsed) < 0) {
-            availableElement.classList.add('color--negative');
+            availableElement.classList.add('text-danger');
         }
     }
 

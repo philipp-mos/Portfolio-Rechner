@@ -2,31 +2,3 @@ body {
     min-height: 75rem;
     padding-top: 4.5rem;
 }
-
-.text-left {
-    text-align: left;
-}
-
-.text-right {
-    text-align: right;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.font-bold {
-    font-weight: bold;
-}
-
-.color--positive {
-    color: #1dd1a1 !important;
-}
-
-.color--negative {
-    color: #ee5253 !important;
-}
-
-.color--neutral {
-    color: #fbc531 !important;
-}
