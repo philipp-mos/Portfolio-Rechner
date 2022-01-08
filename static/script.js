@@ -13,6 +13,7 @@
         portfolioData = JSON.parse(request.responseText);
 
         portfolioData.portfolioItems.sort((a, b) => (a.targetPercentage < b.targetPercentage ? 1 : -1));
+        portfolioData.expenses.sort((a, b) => (a.amount < b.amount ? 1 : -1));
     }
 
 
@@ -140,7 +141,7 @@
         const monthlySavings = portfolioItem.changeGoalValue / portfolioData.goalReachInMonths;
         portfolioData.monthlySavingForGoal += monthlySavings;
 
-        
+
         if (portfolioItem.monthlySavings !== null && portfolioItem.monthlySavings !== undefined) {
             if (isRelevantForSaving) {
                 portfolioData.monthlySavings += portfolioItem.monthlySavings;
@@ -259,7 +260,6 @@
         document.getElementById('interest-finalvalue').innerText = `${formatFloatingNumber(finalValue)} €`;
         document.getElementById('interest-totalsaved').innerText = `${formatFloatingNumber(portfolioData.interestInitialAmount + (portfolioData.monthlySavings * 12) * portfolioData.monthlySavingDurationInYears)} €`;
         document.getElementById('interest-totalinterests').innerText = `${formatFloatingNumber(totalCompoudInterest)} €`;
-
     }
 
 
@@ -300,7 +300,7 @@
             if (available < 0) {
                 cell4.classList.add('text-danger');
             }
-            else if (available > 0 && available < 25) {
+            else if (available > 0 && available < portfolioData.exemptionOrderAlertAt) {
                 cell4.classList.add('text-warning');
             }
         });
@@ -324,6 +324,36 @@
 
         if ((totalAmount - alreadyUsed) < 0) {
             availableElement.classList.add('text-danger');
+        }
+    }
+
+
+    const initExpensesOverview = () => {
+        const tbodyElement = document.getElementById('expensesoverviewtable').querySelectorAll('tbody')[0];
+        portfolioData.expensesTotalAmount = 0;
+
+        portfolioData.expenses.forEach((expense) => {
+            const row = tbodyElement.insertRow();
+
+            const cell1 = row.insertCell();
+            const cell2 = row.insertCell();
+
+            cell1.innerText = expense.title;
+            cell2.innerText = `${formatFloatingNumber(expense.amount)} €`;
+
+            portfolioData.expensesTotalAmount += expense.amount;
+
+            cell1.classList.add('text-start');
+            cell2.classList.add('text-end');
+        });
+
+        document.getElementById('expenses-totalamount').innerText = `${formatFloatingNumber(portfolioData.expensesTotalAmount)} €`;
+
+        portfolioData.expensesToIncomeQuota = (portfolioData.expensesTotalAmount / portfolioData.monthlyIncome) * 100;
+        const expensesIncomeQuotaElement = document.getElementById('expenses-incomequota');
+        expensesIncomeQuotaElement.innerText = `${formatFloatingNumber(portfolioData.expensesToIncomeQuota)} %`;
+        if (portfolioData.expensesToIncomeQuota > portfolioData.expensesToIncomeQuotaAlertValue) {
+            expensesIncomeQuotaElement.classList.add('text-danger');
         }
     }
 
@@ -374,4 +404,5 @@
     initPortfolioResults();
     initExemptionOrders();
     initMonthlySavings();
+    initExpensesOverview();
 }

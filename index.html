@@ -44,6 +44,7 @@
                     <h1>Portfolio-Rechner</h1>
                 </div>
             </div>
+
             <div class="row" id="anchor-rebalancing">
                 <div class="col-12">
                     <h3>Rebalancing-Übersicht</h3>
@@ -105,7 +106,7 @@
                             </tr>
                         </thead>
                         <tbody></tbody>
-                        </table>
+                    </table>
                 </div>
             </div>
 
@@ -142,14 +143,27 @@
                 </div>
             </div>
 
-            
             <div class="row" id="anchor-expenses">
                 <div class="col-12">
                     <h3>Ausgabenübersicht</h3>
+                    <div><span class="fw-bold">Gesamtausgaben:</span> <span id="expenses-totalamount"></span></div>
+                    <div><span class="fw-bold">Anteil am Einkommen:</span> <span id="expenses-incomequota"></span></div>
+                    <table id="expensesoverviewtable" class="table table-striped table-responsive">
+                        <colgroup>
+                            <col width="250">
+                            <col width="150">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="text-start">Titel</th>
+                                <th class="text-end">Betrag</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
-            
-            
+
         </div>
     </main>
 
