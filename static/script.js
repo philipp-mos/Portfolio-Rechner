@@ -61,8 +61,9 @@
 
         calculateValuesAndTriggerBuildingRows(portfolioResultsTable);
 
+        document.getElementById('portfoliototalmonthlysavings').innerText = `${formatFloatingNumber(portfolioData.monthlySavings)} €`;
         document.getElementById('portfolioreachgoalinmonths').innerText = `${portfolioData.goalReachInMonths} Monate`;
-        document.getElementById('portfoliomonthlysavings').innerText = `${formatFloatingNumber(portfolioData.monthlySavingForGoal)} €`;
+        document.getElementById('portfoliomonthlygoalsavings').innerText = `${formatFloatingNumber(portfolioData.monthlySavingForGoal)} €`;
     }
 
 
@@ -86,7 +87,7 @@
 
             portfolioItem.targetGoalValue = portfolioData.goalAmount * (portfolioItem.targetPercentage / 100);
             portfolioItem.changeGoalValue = portfolioItem.targetGoalValue - portfolioItem.currentValue;
-            portfolioItem.changeValueFinalGoalText = buildPortfolioChangeValueText(portfolioItem.changeGoalValue);
+            portfolioItem.changeValueFinalGoalText = `<span class="badge bg-secondary fw-bold">${formatFloatingNumber(portfolioItem.changeGoalValue)} €</span>`;
 
             buildTableRow(tbodyElement, portfolioItem);
         });
@@ -126,48 +127,47 @@
         const cell7 = row.insertCell();
         const cell8 = row.insertCell();
         const cell9 = row.insertCell();
-        const cell10 = row.insertCell();
 
         cell1.innerHTML = `<span class="fw-bold">${portfolioItem.title}</span><br />(${getDepotOrAccountTitleById(portfolioItem.depotOrAccountId)})`;
         cell2.innerText = `${formatFloatingNumber(portfolioItem.currentPercentage)} %`;
         cell3.innerText = `${formatFloatingNumber(portfolioItem.currentValue)} €`;
         cell4.innerText = `${formatFloatingNumber(portfolioItem.targetPercentage)} %`;
         cell5.innerText = `${formatFloatingNumber(portfolioItem.targetValue)} €`;
-        cell6.innerHTML = `${portfolioItem.changeValueText}`;
-        cell7.innerHTML = `${portfolioItem.changeValueFinalGoalText}`;
+        cell6.innerHTML = `${portfolioItem.changeValueText}<br />${portfolioItem.changeValueFinalGoalText}`;
 
         const isRelevantForSaving = (portfolioItem.relevantForSavings !== null && portfolioItem.relevantForSavings !== undefined) && portfolioItem.relevantForSavings;
 
         const monthlySavings = portfolioItem.changeGoalValue / portfolioData.goalReachInMonths;
         portfolioData.monthlySavingForGoal += monthlySavings;
-        cell8.innerText = `${formatFloatingNumber(monthlySavings)} €`;
 
-        /*
+        
         if (portfolioItem.monthlySavings !== null && portfolioItem.monthlySavings !== undefined) {
             if (isRelevantForSaving) {
                 portfolioData.monthlySavings += portfolioItem.monthlySavings;
             }
-            cell8.innerText = `${formatFloatingNumber(portfolioItem.monthlySavings)} €`;
+            cell7.innerHTML = `${formatFloatingNumber(portfolioItem.monthlySavings)} €`;
         }
         else {
-            cell8.innerText = `${formatFloatingNumber(0)} €`;
-        }*/
+            cell7.innerHTML = `${formatFloatingNumber(0)} €`;
+        }
+
+        cell7.innerHTML += `<br /><span class="text-muted">${formatFloatingNumber(monthlySavings)} €</span>`;
 
         if (isRelevantForSaving) {
                 portfolioData.interestInitialAmount += portfolioItem.currentValue;
-                cell9.innerHTML = '&#10003;';
-                cell9.classList.add('text-success');
+                cell8.innerHTML = '&#10003;';
+                cell8.classList.add('text-success');
         }
         else {
-            cell9.innerHTML = '&#10005;';
-            cell9.classList.add('text-danger');
+            cell8.innerHTML = '&#10005;';
+            cell8.classList.add('text-danger');
         }
 
 
         if (portfolioItem.descriptionItems !== null && portfolioItem.descriptionItems !== undefined) {
 
             portfolioItem.descriptionItems.forEach((descriptionItem) => {
-                cell10.innerHTML += `<div class="badge bg-secondary me-2">${descriptionItem}</div>`;
+                cell9.innerHTML += `<div class="badge bg-secondary me-2">${descriptionItem}</div>`;
             });
 
         }
@@ -179,8 +179,8 @@
         cell5.classList.add('text-end');
         cell6.classList.add('text-end');
         cell7.classList.add('text-end');
-        cell8.classList.add('text-end');
-        cell9.classList.add('text-center');
+        cell8.classList.add('text-center');
+        cell9.classList.add('text-end');
     }
 
 
@@ -374,5 +374,4 @@
     initPortfolioResults();
     initExemptionOrders();
     initMonthlySavings();
-    console.log(portfolioData);
 }
