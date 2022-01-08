@@ -37,18 +37,19 @@
      * @returns
      */
     const buildPortfolioResults = (portfolioResultsTable) => {
-        let portfolioTotalAssets = 0;
         let portfolioTotalPercentage = 0;
+        portfolioData.totalAssets = 0;
+        portfolioData.monthlySavingForGoal = 0;
 
         portfolioData.portfolioItems.forEach((portfolioItem) => {
-            portfolioTotalAssets += Number.parseFloat(portfolioItem.currentValue);
+            portfolioData.totalAssets += Number.parseFloat(portfolioItem.currentValue);
             portfolioTotalPercentage += Number.parseFloat(portfolioItem.targetPercentage);
         });
 
-        const totalAssetsInfo = document.getElementById('portfoliototalassets');
-        totalAssetsInfo.innerText = `${formatFloatingNumber(portfolioTotalAssets)} €`;
+        document.getElementById('portfoliototalassets').innerText = `${formatFloatingNumber(portfolioData.totalAssets)} €`;
+        document.getElementById('portfoliogoalvalue').innerText = `${formatFloatingNumber(portfolioData.goalAmount)} €`;
 
-        if (portfolioTotalAssets === 0) {
+        if (portfolioData.totalAssets === 0) {
             return;
         }
 
@@ -58,7 +59,10 @@
             percentageError.classList.add('color--negative');
         }
 
-        calculateValuesAndTriggerBuildingRows(portfolioResultsTable, portfolioTotalAssets);
+        calculateValuesAndTriggerBuildingRows(portfolioResultsTable);
+
+        document.getElementById('portfolioreachgoalinmonths').innerText = `${portfolioData.goalReachInMonths} Monate`;
+        document.getElementById('portfoliomonthlysavings').innerText = `${formatFloatingNumber(portfolioData.monthlySavingForGoal)} €`;
     }
 
 
@@ -66,35 +70,42 @@
      * Individual Calculation and saving Values in global array
      * Starts building single Table Rows
      * @param {HTMLElement} portfolioResultsTable
-     * @param {number} portfolioTotalAssets
      */
-    const calculateValuesAndTriggerBuildingRows = (portfolioResultsTable, portfolioTotalAssets) => {
+    const calculateValuesAndTriggerBuildingRows = (portfolioResultsTable) => {
         const tbodyElement = portfolioResultsTable.querySelectorAll('tbody')[0];
 
         portfolioData.monthlySavings = 0;
         portfolioData.interestInitialAmount = 0;
 
         portfolioData.portfolioItems.forEach((portfolioItem) => {
-            portfolioItem.currentPercentage = (portfolioItem.currentValue / portfolioTotalAssets) * 100;
-            portfolioItem.targetValue = portfolioTotalAssets * (portfolioItem.targetPercentage / 100);
+            portfolioItem.currentPercentage = (portfolioItem.currentValue / portfolioData.totalAssets) * 100;
+            portfolioItem.targetValue = portfolioData.totalAssets * (portfolioItem.targetPercentage / 100);
             portfolioItem.changeValue = portfolioItem.targetValue - portfolioItem.currentValue;
 
+            portfolioItem.changeValueText = buildPortfolioChangeValueText(portfolioItem.changeValue);
 
-            if (portfolioItem.changeValue > 0) {
-                portfolioItem.changeValueText = `<span class="badge bg-success fw-bold">Buy: ${formatFloatingNumber(portfolioItem.changeValue)} €</span>`;
-            }
-            else if (portfolioItem.changeValue < 0 && portfolioItem.changeValue > portfolioData.rebalancingNegativeHoldDelay) {
-                portfolioItem.changeValueText = `<span class="badge bg-warning fw-bold text-dark">Hold: (${formatFloatingNumber(portfolioItem.changeValue)} €)</span>`;
-            }
-            else if (portfolioItem.changeValue < 0) {
-                portfolioItem.changeValueText = `<span class="badge bg-danger fw-bold">Sell: ${formatFloatingNumber(portfolioItem.changeValue * -1)} €</span>`;
-            }
-            else {
-                portfolioItem.changeValueText = '-';
-            }
+            portfolioItem.targetGoalValue = portfolioData.goalAmount * (portfolioItem.targetPercentage / 100);
+            portfolioItem.changeGoalValue = portfolioItem.targetGoalValue - portfolioItem.currentValue;
+            portfolioItem.changeValueFinalGoalText = buildPortfolioChangeValueText(portfolioItem.changeGoalValue);
 
             buildTableRow(tbodyElement, portfolioItem);
         });
+    }
+
+
+    const buildPortfolioChangeValueText = (changeValue) => {
+        if (changeValue > 0) {
+            return `<span class="badge bg-success fw-bold">Buy: ${formatFloatingNumber(changeValue)} €</span>`;
+        }
+        else if (changeValue < 0 && changeValue > portfolioData.rebalancingNegativeHoldDelay) {
+            return `<span class="badge bg-warning fw-bold text-dark">Hold: (${formatFloatingNumber(changeValue)} €)</span>`;
+        }
+        else if (changeValue < 0) {
+            return `<span class="badge bg-danger fw-bold">Sell: ${formatFloatingNumber(changeValue * -1)} €</span>`;
+        }
+        else {
+            return '-';
+        }
     }
 
 
@@ -115,6 +126,7 @@
         const cell7 = row.insertCell();
         const cell8 = row.insertCell();
         const cell9 = row.insertCell();
+        const cell10 = row.insertCell();
 
         cell1.innerHTML = `<span class="fw-bold">${portfolioItem.title}</span><br />(${getDepotOrAccountTitleById(portfolioItem.depotOrAccountId)})`;
         cell2.innerText = `${formatFloatingNumber(portfolioItem.currentPercentage)} %`;
@@ -122,34 +134,40 @@
         cell4.innerText = `${formatFloatingNumber(portfolioItem.targetPercentage)} %`;
         cell5.innerText = `${formatFloatingNumber(portfolioItem.targetValue)} €`;
         cell6.innerHTML = `${portfolioItem.changeValueText}`;
+        cell7.innerHTML = `${portfolioItem.changeValueFinalGoalText}`;
 
         const isRelevantForSaving = (portfolioItem.relevantForSavings !== null && portfolioItem.relevantForSavings !== undefined) && portfolioItem.relevantForSavings;
 
+        const monthlySavings = portfolioItem.changeGoalValue / portfolioData.goalReachInMonths;
+        portfolioData.monthlySavingForGoal += monthlySavings;
+        cell8.innerText = `${formatFloatingNumber(monthlySavings)} €`;
+
+        /*
         if (portfolioItem.monthlySavings !== null && portfolioItem.monthlySavings !== undefined) {
             if (isRelevantForSaving) {
                 portfolioData.monthlySavings += portfolioItem.monthlySavings;
             }
-            cell7.innerText = `${formatFloatingNumber(portfolioItem.monthlySavings)} €`;
+            cell8.innerText = `${formatFloatingNumber(portfolioItem.monthlySavings)} €`;
         }
         else {
-            cell7.innerText = `${formatFloatingNumber(0)} €`;
-        }
+            cell8.innerText = `${formatFloatingNumber(0)} €`;
+        }*/
 
         if (isRelevantForSaving) {
                 portfolioData.interestInitialAmount += portfolioItem.currentValue;
-                cell8.innerHTML = '&#10003;';
-                cell8.classList.add('text-success');
+                cell9.innerHTML = '&#10003;';
+                cell9.classList.add('text-success');
         }
         else {
-            cell8.innerHTML = '&#10005;';
-            cell8.classList.add('text-danger');
+            cell9.innerHTML = '&#10005;';
+            cell9.classList.add('text-danger');
         }
 
 
         if (portfolioItem.descriptionItems !== null && portfolioItem.descriptionItems !== undefined) {
 
             portfolioItem.descriptionItems.forEach((descriptionItem) => {
-                cell9.innerHTML += `<div class="badge bg-secondary me-2">${descriptionItem}</div>`;
+                cell10.innerHTML += `<div class="badge bg-secondary me-2">${descriptionItem}</div>`;
             });
 
         }
@@ -161,7 +179,8 @@
         cell5.classList.add('text-end');
         cell6.classList.add('text-end');
         cell7.classList.add('text-end');
-        cell8.classList.add('text-center');
+        cell8.classList.add('text-end');
+        cell9.classList.add('text-center');
     }
 
 
@@ -355,4 +374,5 @@
     initPortfolioResults();
     initExemptionOrders();
     initMonthlySavings();
+    console.log(portfolioData);
 }
