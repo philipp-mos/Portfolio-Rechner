@@ -192,7 +192,7 @@
         document.getElementById('interest-initialamount').innerText = `${formatFloatingNumber(portfolioData.interestInitialAmount)} €`;
         document.getElementById('interest-monthlysaving').innerText = `${formatFloatingNumber(portfolioData.monthlySavings)} €`;
         document.getElementById('interest-duration').innerText = `${portfolioData.monthlySavingDurationInYears} Jahre`;
-        document.getElementById('interest-yearlyinterest').innerText = `${formatFloatingNumber(portfolioData.monthlySavingYearlyInterest)} %`;
+        document.getElementById('interest-yearlyinterest').innerText = `${formatFloatingNumber(portfolioData.savingYearlyInterest)} %`;
 
 
         const tbodyElement = document.getElementById('interestoverview').querySelectorAll('tbody')[0];
@@ -206,7 +206,7 @@
             const compoundInterest = calculateCompoundInterest(
                 totalBaseValue,
                 1,
-                portfolioData.monthlySavingYearlyInterest,
+                portfolioData.savingYearlyInterest,
                 12
             );
 
