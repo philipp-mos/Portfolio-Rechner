@@ -265,12 +265,21 @@
         let totalAmount = 0;
         let alreadyUsed = 0;
 
-        portfolioData.depotsOrAccounts.forEach((depotOrAccount) => {
-            const exemptionOrder = depotOrAccount.exemptionOrder;
+        let exemptionOrderAccounts = [];
 
-            if (exemptionOrder === null || exemptionOrder === undefined) {
+        portfolioData.depotsOrAccounts.forEach((depotOrAccount) => {
+            if (depotOrAccount.exemptionOrder === null || depotOrAccount.exemptionOrder === undefined) {
                 return;
             }
+            
+            exemptionOrderAccounts.push(depotOrAccount);
+        });
+
+        exemptionOrderAccounts.sort((a, b) => (a.exemptionOrder.amount < b.exemptionOrder.amount ? 1 : -1));
+
+
+        exemptionOrderAccounts.forEach((depotOrAccount) => {
+            const exemptionOrder = depotOrAccount.exemptionOrder;
 
             totalAmount += exemptionOrder.amount;
             alreadyUsed += exemptionOrder.alreadyUsed;
