@@ -1,16 +1,43 @@
 import './ExemptionOrder.css';
+import { FormatPriceValue } from '../../Helper/NumberHelper';
+
+
 
 function ExemptionOrder() {
-  return (
 
-      <div class="row" id="anchor-exemptions">
+  let exemptionOrderTotal = 0;
+  let exemptionOrderUsed = 0;
+
+  let exemptionOrders = [
+    {
+      'title': '',
+      'amount': 0,
+      'alreadyUsed': 0
+    },
+    {
+      'title': '',
+      'amount': 0,
+      'alreadyUsed': 0
+    }
+  ]
+  .sort((a, b) => {
+    return b.amount - a.amount;
+  });
+
+  exemptionOrders.forEach((exemptionOrder) => {
+    exemptionOrderTotal += exemptionOrder.amount;
+    exemptionOrderUsed += exemptionOrder.alreadyUsed;
+  });
+
+  return (
+      <div class="row">
         <div class="col-12">
           <h3>Freistellungsaufträge:</h3>
-          <div><span class="fw-bold">Gesamtfreistellungsauftrag:</span> <span id="exemptionorder-totalamount"></span></div>
-          <div><span class="fw-bold">Bereits verwendet:</span> <span id="exemptionorder-alreadyused"></span></div>
-          <div><span class="fw-bold">Noch verfügbar:</span> <span id="exemptionorder-available"></span></div>
+          <div><span class="fw-bold">Gesamtfreistellungsauftrag:</span> {FormatPriceValue(exemptionOrderTotal)}</div>
+          <div><span class="fw-bold">Bereits verwendet:</span> {FormatPriceValue(exemptionOrderUsed)}</div>
+          <div><span class="fw-bold">Noch verfügbar:</span> {FormatPriceValue(exemptionOrderTotal - exemptionOrderUsed)}</div>
                     
-          <table id="exemptionordertable" class="table table-striped table-responsive">
+          <table class="table table-striped table-responsive">
             <colgroup>
               <col width="250" />
               <col width="150" />
@@ -26,11 +53,24 @@ function ExemptionOrder() {
               </tr>
             </thead>
             <tbody>
+              {exemptionOrders.map(item => {
+                if (item.amount <= 0 && item.alreadyUsed <= 0) {
+                  return; 
+                }
+
+                return (
+                  <tr key={item.title}>
+                    <td>{item.title}</td>
+                    <td class="text-end">{FormatPriceValue(item.amount)}</td>
+                    <td class="text-end">{FormatPriceValue(item.alreadyUsed)}</td>
+                    <td class="text-end">{FormatPriceValue(item.amount - item.alreadyUsed)}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </div>
-
   );
 }
 
