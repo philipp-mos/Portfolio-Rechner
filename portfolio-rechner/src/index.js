@@ -4,6 +4,7 @@ import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Rebalancing from './Components/Rebalancing/Rebalancing';
 import ExemptionOrder from './Components/ExemptionOrder/ExemptionOrder';
+import MonthlyExpenses from './Components/MonthlyExpenses/MonthlyExpenses';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -18,6 +19,7 @@ root.render(
       <React.StrictMode>
         <Rebalancing />
         <ExemptionOrder />
+        <MonthlyExpenses />
       </React.StrictMode>
     </div>
   </main>

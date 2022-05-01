@@ -30,4 +30,13 @@ export default class PortfolioDataProvider {
     getDepotsOrAccounts() {
         return portfolioData.depotsOrAccounts;
     }
+
+
+    getExpenses() {
+        return portfolioData.expenses;
+    }
+
+    getMonthlyIncome() {
+        return portfolioData.monthlyIncome;
+    }
 }
