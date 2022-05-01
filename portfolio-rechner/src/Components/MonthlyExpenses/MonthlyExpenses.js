@@ -16,6 +16,10 @@ function MonthlyExpenses() {
 
   let percentageToIncome = (expensesTotal / portfolioDataProvider.getMonthlyIncome()) * 100;
 
+  expenses.sort((a, b) => {
+    return b.amount - a.amount;
+  });
+
 
   return (
       <div class="row">

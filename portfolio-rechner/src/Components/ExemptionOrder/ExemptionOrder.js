@@ -1,4 +1,3 @@
-import './ExemptionOrder.css';
 import { FormatPriceValue } from '../../Helper/NumberHelper';
 import PortfolioDataProvider from '../../Data/PortfolioDataProvider';
 

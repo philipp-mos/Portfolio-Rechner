@@ -1,7 +1,6 @@
 import PortfolioDataProvider from '../../Data/PortfolioDataProvider';
 import { FormatPriceValue, FormatFloatValue } from '../../Helper/NumberHelper';
-
-import './Rebalancing.css';
+import { getMonthDifference } from '../../Helper/DateHelper';
 
 
 function Rebalancing() {
@@ -19,6 +18,9 @@ function Rebalancing() {
       monthlySavings += portfolioItem.monthlySavings;
     }    
   });
+
+  let targetGoalAmountOfMonths = getMonthDifference(new Date(), new Date(data.goalReachDate));
+  let targetGoalMonthlySavings = (data.goalAmount - totalAssets) / targetGoalAmountOfMonths;
   
   
   return (
@@ -28,7 +30,7 @@ function Rebalancing() {
           <div><span class="fw-bold">Assets Gesamt:</span> {FormatPriceValue(totalAssets)}</div>
           <div><span class="fw-bold">Monatliche Sparrate:</span> {FormatPriceValue(monthlySavings)}</div>
           <div><span class="fw-bold">Zielbetrag:</span> {FormatPriceValue(data.goalAmount)}</div>
-          <div><span class="fw-bold">Monatliche Zielsparsumme ():</span></div>
+          <div><span class="fw-bold">Monatliche Zielsparsumme ({targetGoalAmountOfMonths} Monate):</span> {FormatPriceValue(targetGoalMonthlySavings)}</div>
 
 
           <table class="table table-striped table-responsive">
