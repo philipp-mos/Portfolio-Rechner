@@ -1,32 +1,36 @@
 import './ExemptionOrder.css';
 import { FormatPriceValue } from '../../Helper/NumberHelper';
+import PortfolioDataProvider from '../../Data/PortfolioDataProvider';
 
 
 
 function ExemptionOrder() {
+  let portfolioDataProvider = new PortfolioDataProvider();
 
   let exemptionOrderTotal = 0;
   let exemptionOrderUsed = 0;
 
-  let exemptionOrders = [
-    {
-      'title': '',
-      'amount': 0,
-      'alreadyUsed': 0
-    },
-    {
-      'title': '',
-      'amount': 0,
-      'alreadyUsed': 0
+  let exemptionOrders = [];
+
+  portfolioDataProvider.getDepotsOrAccounts().forEach((depotOrAccount) => {
+    if (depotOrAccount.exemptionOrder == null) {
+      return;
     }
-  ]
-  .sort((a, b) => {
-    return b.amount - a.amount;
+
+    exemptionOrders.push({
+      'title': depotOrAccount.title,
+      'amount': depotOrAccount.exemptionOrder.amount,
+      'alreadyUsed': depotOrAccount.exemptionOrder.alreadyUsed
+    });
+
+
+    exemptionOrderTotal += depotOrAccount.exemptionOrder.amount;
+    exemptionOrderUsed += depotOrAccount.exemptionOrder.alreadyUsed;
   });
 
-  exemptionOrders.forEach((exemptionOrder) => {
-    exemptionOrderTotal += exemptionOrder.amount;
-    exemptionOrderUsed += exemptionOrder.alreadyUsed;
+
+  exemptionOrders.sort((a, b) => {
+      return b.amount - a.amount;
   });
 
   return (

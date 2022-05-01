@@ -4,7 +4,15 @@
  * @returns 
  */
  export const FormatFloatValue = (value) => {
-    return parseFloat(value).toFixed(2);
+    value = Number.parseFloat(value);
+
+    return value.toLocaleString(
+        'de-DE',
+        {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }
+    );
 }
 
 /**
