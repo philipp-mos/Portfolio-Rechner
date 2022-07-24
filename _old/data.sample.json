@@ -1,0 +1,49 @@
+{
+    "savingYearlyInterest": 0,
+    "birthYear": 0,
+    "finalAge": 0,
+    "rebalancingNegativeHoldDelay": 0,
+    "goalReachInMonths": 0,
+    "goalAmount": 0,
+    "monthlyIncome": 0,
+    "expensesToIncomeQuotaAlertValue": 0,
+    "portfolioItems":
+    [
+        {
+            "title": "string",
+            "descriptionItems":
+            [
+                "string"
+            ],
+            "depotOrAccountId": 0,
+            "priority": 0,
+            "currentValue": 0,
+            "targetPercentage": 0,
+            "relevantForSavings": false,
+            "monthlySavings": 0
+        }
+    ],
+    "exemptionOrderMaxValue": 0,
+    "exemptionOrderAlertAt": 0,
+    "depotsOrAccounts":
+    [
+        {
+            "id": 0,
+            "title": "string",
+            "exemptionOrder":
+            {
+                "amount": 0,
+                "alreadyUsed": 0
+            }
+        }
+    ],
+    "expenses":
+    [
+        {
+            "title": "string",
+            "amount": 0,
+            "dueDay": 1
+        }
+    ]
+
+}

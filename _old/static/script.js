@@ -13,6 +13,7 @@
         portfolioData = JSON.parse(request.responseText);
 
         portfolioData.portfolioItems.sort((a, b) => (a.targetPercentage < b.targetPercentage ? 1 : -1));
+        portfolioData.expenses.sort((a, b) => (a.amount < b.amount ? 1 : -1));
     }
 
 
@@ -37,18 +38,19 @@
      * @returns
      */
     const buildPortfolioResults = (portfolioResultsTable) => {
-        let portfolioTotalAssets = 0;
         let portfolioTotalPercentage = 0;
+        portfolioData.totalAssets = 0;
+        portfolioData.monthlySavingForGoal = 0;
 
         portfolioData.portfolioItems.forEach((portfolioItem) => {
-            portfolioTotalAssets += Number.parseFloat(portfolioItem.currentValue);
+            portfolioData.totalAssets += Number.parseFloat(portfolioItem.currentValue);
             portfolioTotalPercentage += Number.parseFloat(portfolioItem.targetPercentage);
         });
 
-        const totalAssetsInfo = document.getElementById('portfoliototalassets');
-        totalAssetsInfo.innerText = `${formatFloatingNumber(portfolioTotalAssets)} €`;
+        document.getElementById('portfoliototalassets').innerText = `${formatFloatingNumber(portfolioData.totalAssets)} €`;
+        document.getElementById('portfoliogoalvalue').innerText = `${formatFloatingNumber(portfolioData.goalAmount)} €`;
 
-        if (portfolioTotalAssets === 0) {
+        if (portfolioData.totalAssets === 0) {
             return;
         }
 
@@ -58,7 +60,11 @@
             percentageError.classList.add('color--negative');
         }
 
-        calculateValuesAndTriggerBuildingRows(portfolioResultsTable, portfolioTotalAssets);
+        calculateValuesAndTriggerBuildingRows(portfolioResultsTable);
+
+        document.getElementById('portfoliototalmonthlysavings').innerText = `${formatFloatingNumber(portfolioData.monthlySavings)} €`;
+        document.getElementById('portfolioreachgoalinmonths').innerText = `${portfolioData.goalReachInMonths} Monate`;
+        document.getElementById('portfoliomonthlygoalsavings').innerText = `${formatFloatingNumber(portfolioData.monthlySavingForGoal)} €`;
     }
 
 
@@ -66,35 +72,42 @@
      * Individual Calculation and saving Values in global array
      * Starts building single Table Rows
      * @param {HTMLElement} portfolioResultsTable
-     * @param {number} portfolioTotalAssets
      */
-    const calculateValuesAndTriggerBuildingRows = (portfolioResultsTable, portfolioTotalAssets) => {
+    const calculateValuesAndTriggerBuildingRows = (portfolioResultsTable) => {
         const tbodyElement = portfolioResultsTable.querySelectorAll('tbody')[0];
 
         portfolioData.monthlySavings = 0;
         portfolioData.interestInitialAmount = 0;
 
         portfolioData.portfolioItems.forEach((portfolioItem) => {
-            portfolioItem.currentPercentage = (portfolioItem.currentValue / portfolioTotalAssets) * 100;
-            portfolioItem.targetValue = portfolioTotalAssets * (portfolioItem.targetPercentage / 100);
+            portfolioItem.currentPercentage = (portfolioItem.currentValue / portfolioData.totalAssets) * 100;
+            portfolioItem.targetValue = portfolioData.totalAssets * (portfolioItem.targetPercentage / 100);
             portfolioItem.changeValue = portfolioItem.targetValue - portfolioItem.currentValue;
 
+            portfolioItem.changeValueText = buildPortfolioChangeValueText(portfolioItem.changeValue);
 
-            if (portfolioItem.changeValue > 0) {
-                portfolioItem.changeValueText = `<span class="badge bg-success fw-bold">Buy: ${formatFloatingNumber(portfolioItem.changeValue)} €</span>`;
-            }
-            else if (portfolioItem.changeValue < 0 && portfolioItem.changeValue > portfolioData.rebalancingNegativeHoldDelay) {
-                portfolioItem.changeValueText = `<span class="badge bg-warning fw-bold text-dark">Hold: (${formatFloatingNumber(portfolioItem.changeValue)} €)</span>`;
-            }
-            else if (portfolioItem.changeValue < 0) {
-                portfolioItem.changeValueText = `<span class="badge bg-danger fw-bold">Sell: ${formatFloatingNumber(portfolioItem.changeValue * -1)} €</span>`;
-            }
-            else {
-                portfolioItem.changeValueText = '-';
-            }
+            portfolioItem.targetGoalValue = portfolioData.goalAmount * (portfolioItem.targetPercentage / 100);
+            portfolioItem.changeGoalValue = portfolioItem.targetGoalValue - portfolioItem.currentValue;
+            portfolioItem.changeValueFinalGoalText = `<span class="badge bg-secondary fw-bold">${formatFloatingNumber(portfolioItem.changeGoalValue)} €</span>`;
 
             buildTableRow(tbodyElement, portfolioItem);
         });
+    }
+
+
+    const buildPortfolioChangeValueText = (changeValue) => {
+        if (changeValue > 0) {
+            return `<span class="badge bg-success fw-bold">Buy: ${formatFloatingNumber(changeValue)} €</span>`;
+        }
+        else if (changeValue < 0 && changeValue > portfolioData.rebalancingNegativeHoldDelay) {
+            return `<span class="badge bg-warning fw-bold text-dark">Hold: (${formatFloatingNumber(changeValue)} €)</span>`;
+        }
+        else if (changeValue < 0) {
+            return `<span class="badge bg-danger fw-bold">Sell: ${formatFloatingNumber(changeValue * -1)} €</span>`;
+        }
+        else {
+            return '-';
+        }
     }
 
 
@@ -121,19 +134,25 @@
         cell3.innerText = `${formatFloatingNumber(portfolioItem.currentValue)} €`;
         cell4.innerText = `${formatFloatingNumber(portfolioItem.targetPercentage)} %`;
         cell5.innerText = `${formatFloatingNumber(portfolioItem.targetValue)} €`;
-        cell6.innerHTML = `${portfolioItem.changeValueText}`;
+        cell6.innerHTML = `${portfolioItem.changeValueText}<br />${portfolioItem.changeValueFinalGoalText}`;
 
         const isRelevantForSaving = (portfolioItem.relevantForSavings !== null && portfolioItem.relevantForSavings !== undefined) && portfolioItem.relevantForSavings;
+
+        const monthlySavings = portfolioItem.changeGoalValue / portfolioData.goalReachInMonths;
+        portfolioData.monthlySavingForGoal += monthlySavings;
+
 
         if (portfolioItem.monthlySavings !== null && portfolioItem.monthlySavings !== undefined) {
             if (isRelevantForSaving) {
                 portfolioData.monthlySavings += portfolioItem.monthlySavings;
             }
-            cell7.innerText = `${formatFloatingNumber(portfolioItem.monthlySavings)} €`;
+            cell7.innerHTML = `${formatFloatingNumber(portfolioItem.monthlySavings)} €`;
         }
         else {
-            cell7.innerText = `${formatFloatingNumber(0)} €`;
+            cell7.innerHTML = `${formatFloatingNumber(0)} €`;
         }
+
+        cell7.innerHTML += `<br /><span class="text-muted">${formatFloatingNumber(monthlySavings)} €</span>`;
 
         if (isRelevantForSaving) {
                 portfolioData.interestInitialAmount += portfolioItem.currentValue;
@@ -162,6 +181,7 @@
         cell6.classList.add('text-end');
         cell7.classList.add('text-end');
         cell8.classList.add('text-center');
+        cell9.classList.add('text-end');
     }
 
 
@@ -197,8 +217,8 @@
         let totalCompoudInterest = 0;
         let finalValue = 0;
 
-        for (let i = 1; i <= (portfolioData.monthlySavingDurationInYears + 1); i++) {
-            let totalSavedAmount = portfolioData.interestInitialAmount + ((portfolioData.monthlySavings * 12) * (i - 1));
+        for (let i = 1; i <= (portfolioData.monthlySavingDurationInYears); i++) {
+            let totalSavedAmount = portfolioData.interestInitialAmount + ((portfolioData.monthlySavings * 12) * i);
             const totalBaseValue = totalSavedAmount + totalCompoudInterest;
 
             const compoundInterest = calculateCompoundInterest(
@@ -212,10 +232,6 @@
 
             finalValue = totalBaseValue;
 
-            if (portfolioData.monthlySavingDurationInYears < i) {
-                continue;
-            }
-
             const row = tbodyElement.insertRow();
 
             const cell1 = row.insertCell();
@@ -224,7 +240,7 @@
             const cell4 = row.insertCell();
             const cell5 = row.insertCell();
 
-            cell1.innerHTML = `(${i}) <strong>${new Date().getFullYear() + (i - 1)}</strong> (Alter: ${portfolioData.currentAge + i})`;
+            cell1.innerHTML = `(${i}) Ende <strong>${new Date().getFullYear() + (i - 1)}</strong> (Alter: ${portfolioData.currentAge + i})`;
             cell2.innerText = `${formatFloatingNumber(portfolioData.monthlySavings * 12)} €`;
             cell3.innerText = `${formatFloatingNumber(totalSavedAmount)} €`;
             cell4.innerText = `${formatFloatingNumber(totalBaseValue)} €`;
@@ -240,7 +256,6 @@
         document.getElementById('interest-finalvalue').innerText = `${formatFloatingNumber(finalValue)} €`;
         document.getElementById('interest-totalsaved').innerText = `${formatFloatingNumber(portfolioData.interestInitialAmount + (portfolioData.monthlySavings * 12) * portfolioData.monthlySavingDurationInYears)} €`;
         document.getElementById('interest-totalinterests').innerText = `${formatFloatingNumber(totalCompoudInterest)} €`;
-
     }
 
 
@@ -250,12 +265,21 @@
         let totalAmount = 0;
         let alreadyUsed = 0;
 
-        portfolioData.depotsOrAccounts.forEach((depotOrAccount) => {
-            const exemptionOrder = depotOrAccount.exemptionOrder;
+        let exemptionOrderAccounts = [];
 
-            if (exemptionOrder === null || exemptionOrder === undefined) {
+        portfolioData.depotsOrAccounts.forEach((depotOrAccount) => {
+            if (depotOrAccount.exemptionOrder === null || depotOrAccount.exemptionOrder === undefined) {
                 return;
             }
+            
+            exemptionOrderAccounts.push(depotOrAccount);
+        });
+
+        exemptionOrderAccounts.sort((a, b) => (a.exemptionOrder.amount < b.exemptionOrder.amount ? 1 : -1));
+
+
+        exemptionOrderAccounts.forEach((depotOrAccount) => {
+            const exemptionOrder = depotOrAccount.exemptionOrder;
 
             totalAmount += exemptionOrder.amount;
             alreadyUsed += exemptionOrder.alreadyUsed;
@@ -281,7 +305,7 @@
             if (available < 0) {
                 cell4.classList.add('text-danger');
             }
-            else if (available > 0 && available < 25) {
+            else if (available > 0 && available < portfolioData.exemptionOrderAlertAt) {
                 cell4.classList.add('text-warning');
             }
         });
@@ -305,6 +329,36 @@
 
         if ((totalAmount - alreadyUsed) < 0) {
             availableElement.classList.add('text-danger');
+        }
+    }
+
+
+    const initExpensesOverview = () => {
+        const tbodyElement = document.getElementById('expensesoverviewtable').querySelectorAll('tbody')[0];
+        portfolioData.expensesTotalAmount = 0;
+
+        portfolioData.expenses.forEach((expense) => {
+            const row = tbodyElement.insertRow();
+
+            const cell1 = row.insertCell();
+            const cell2 = row.insertCell();
+
+            cell1.innerText = expense.title;
+            cell2.innerText = `${formatFloatingNumber(expense.amount)} €`;
+
+            portfolioData.expensesTotalAmount += expense.amount;
+
+            cell1.classList.add('text-start');
+            cell2.classList.add('text-end');
+        });
+
+        document.getElementById('expenses-totalamount').innerText = `${formatFloatingNumber(portfolioData.expensesTotalAmount)} €`;
+
+        portfolioData.expensesToIncomeQuota = (portfolioData.expensesTotalAmount / portfolioData.monthlyIncome) * 100;
+        const expensesIncomeQuotaElement = document.getElementById('expenses-incomequota');
+        expensesIncomeQuotaElement.innerText = `${formatFloatingNumber(portfolioData.expensesToIncomeQuota)} %`;
+        if (portfolioData.expensesToIncomeQuota > portfolioData.expensesToIncomeQuotaAlertValue) {
+            expensesIncomeQuotaElement.classList.add('text-danger');
         }
     }
 
@@ -355,4 +409,5 @@
     initPortfolioResults();
     initExemptionOrders();
     initMonthlySavings();
+    initExpensesOverview();
 }
