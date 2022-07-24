@@ -10,9 +10,11 @@ function Rebalancing() {
 
   let totalAssets = 0;
   let monthlySavings = 0;
+  let totalPercentage = 0;
 
   data.portfolioItems.forEach((portfolioItem) => {
     totalAssets += portfolioItem.currentValue;
+    totalPercentage += portfolioItem.targetPercentage;
 
     if (portfolioItem.monthlySavings != null) {
       monthlySavings += portfolioItem.monthlySavings;
@@ -31,13 +33,12 @@ function Rebalancing() {
           <div><span class="fw-bold">Monatliche Sparrate:</span> {FormatPriceValue(monthlySavings)}</div>
           <div><span class="fw-bold">Zielbetrag:</span> {FormatPriceValue(data.goalAmount)}</div>
           <div><span class="fw-bold">Monatliche Zielsparsumme ({targetGoalAmountOfMonths} Monate):</span> {FormatPriceValue(targetGoalMonthlySavings)}</div>
+          <div><span class="fw-bold">Prozentangabe:</span> {totalPercentage} %</div>
 
 
           <table class="table table-striped table-responsive">
             <colgroup>
                 <col width="200" />
-                <col width="150" />
-                <col width="150" />
                 <col width="150" />
                 <col width="150" />
                 <col width="215" />
@@ -48,10 +49,8 @@ function Rebalancing() {
             <thead>
                 <tr>
                     <th class="text-start">Position</th>
-                    <th class="text-end">Aktueller<br />Anteil</th>
-                    <th class="text-end">Aktueller<br />Wert</th>
-                    <th class="text-end">Ziel<br />Anteil</th>
-                    <th class="text-end">Ziel<br />Wert</th>
+                    <th class="text-end">Aktueller</th>
+                    <th class="text-end">Ziel</th>
                     <th class="text-end">Rebalancing / <br />Zielbetrag</th>
                     <th class="text-end">Sparbetrag / <br />Zielsparbetrag</th>
                     <th class="text-end">Relevant</th>
@@ -75,10 +74,8 @@ function Rebalancing() {
                 return (
                   <tr key={item.title}>
                     <td><span class="fw-bold">{item.title}</span><br />({portfolioDataProvider.getDepotOrAccountById(item.depotOrAccountId)})</td>
-                    <td class="text-end">{FormatFloatValue(currentPercentage)} %</td>
-                    <td class="text-end">{FormatPriceValue(item.currentValue)}</td>
-                    <td class="text-end">{FormatFloatValue(item.targetPercentage)} %</td>
-                    <td class="text-end">{FormatPriceValue(targetValue)}</td>
+                    <td class="text-end">{FormatPriceValue(item.currentValue)}<br />{FormatFloatValue(currentPercentage)} %</td>
+                    <td class="text-end">{FormatPriceValue(targetValue)}<br />{FormatFloatValue(item.targetPercentage)} %</td>
                     <td class="text-end">
                       <span className={`badge fw-bold ${differenceClass}`}>
                         {`${differenceText}: ${FormatPriceValue(difference)}`}

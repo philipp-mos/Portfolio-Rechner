@@ -30,12 +30,14 @@ function MonthlyExpenses() {
                     
           <table class="table table-striped table-responsive">
             <colgroup>
-              <col width="250" />
-              <col width="150" />
+              <col />
+              <col />
+              <col />
             </colgroup>
             <thead>
               <tr>
                 <th class="text-start">Titel</th>
+                <th class="text-start">Fälligkeitstag</th>
                 <th class="text-end">Betrag</th>
               </tr>
             </thead>
@@ -44,6 +46,7 @@ function MonthlyExpenses() {
                 return (
                   <tr key={expense.title}>
                     <td>{expense.title}</td>
+                    <td>{expense.dueDay}. des Monats</td>
                     <td class="text-end">{FormatPriceValue(expense.amount)}</td>
                   </tr>
                 );
