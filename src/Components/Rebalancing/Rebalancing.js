@@ -7,12 +7,13 @@ function Rebalancing() {
   let portfolioDataProvider = new PortfolioDataProvider();
 
   let data = portfolioDataProvider.getAll();
+  let portfolioItems = portfolioDataProvider.getRelevantPortfolioItemsOrdered();
 
   let totalAssets = 0;
   let monthlySavings = 0;
   let totalPercentage = 0;
 
-  data.portfolioItems.forEach((portfolioItem) => {
+  portfolioItems.forEach((portfolioItem) => {
     totalAssets += portfolioItem.currentValue;
     totalPercentage += portfolioItem.targetPercentage;
 
@@ -58,7 +59,7 @@ function Rebalancing() {
                 </tr>
             </thead>
             <tbody>
-              {portfolioDataProvider.getPortfolioItemsOrderedByCurrentValue().map(item => {
+              {portfolioItems.map(item => {
                 let currentPercentage = (item.currentValue / totalAssets) * 100;
                 let targetValue = totalAssets * (item.targetPercentage / 100);
                 let difference = targetValue - item.currentValue;
@@ -71,6 +72,11 @@ function Rebalancing() {
                   differenceText = 'Hold';
                 }
 
+                let monthlyTarget = '-';
+                if (item.monthlySavings !== null) {
+                  monthlyTarget = FormatPriceValue(targetGoalMonthlySavings * (item.targetPercentage / 100));
+                }
+
                 return (
                   <tr key={item.title}>
                     <td><span class="fw-bold">{item.title}</span><br />({portfolioDataProvider.getDepotOrAccountById(item.depotOrAccountId)})</td>
@@ -81,10 +87,9 @@ function Rebalancing() {
                         {`${differenceText}: ${FormatPriceValue(difference)}`}
                       </span>
                     </td>
-                    <td class="text-end">{item.monthlySavings != null ? FormatPriceValue(item.monthlySavings) : '-'}</td>
+                    <td class="text-end">{item.monthlySavings != null ? FormatPriceValue(item.monthlySavings) : '-'}<br />{monthlyTarget}</td>
                     <td className={`text-end ${item.relevantForSavings ? 'text-success' : 'text-danger'}`}>{item.relevantForSavings ? 'Ja' : 'Nein'}</td>
-                    <td class="text-end">{item.descriptionItems.join(', ')}
-                    </td>
+                    <td class="text-end">{item.descriptionItems.join(', ')}</td>
                   </tr>
                 );
               })}

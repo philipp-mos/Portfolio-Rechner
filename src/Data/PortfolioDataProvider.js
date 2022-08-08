@@ -5,6 +5,14 @@ export default class PortfolioDataProvider {
         return portfolioData;
     }
 
+    getRelevantPortfolioItemsOrdered = () => {
+        return portfolioData.portfolioItems
+        .filter((x) => { return x.isRelevant })
+        .sort((a, b) => {
+            return b.currentValue - a.currentValue;
+        });
+    }
+
 
     getPortfolioItemsOrderedByCurrentValue = () => {
         return portfolioData.portfolioItems
