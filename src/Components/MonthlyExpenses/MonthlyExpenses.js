@@ -1,9 +1,17 @@
 import { FormatFloatValue, FormatPriceValue } from '../../Helper/NumberHelper';
-import PortfolioDataProvider from '../../Data/PortfolioDataProvider';
+import PortfolioDataProvider from '../../Provider/PortfolioDataProvider';
+import FeatureProvider from '../../Provider/FeatureProvider';
 
 
 
 function MonthlyExpenses() {
+  let featureProvider = new FeatureProvider();
+
+  if (!featureProvider.isFeatureActive(featureProvider.monthlyExpenses)) {
+    return null;
+  }
+
+  
   let portfolioDataProvider = new PortfolioDataProvider();
 
   let expensesTotal = 0;

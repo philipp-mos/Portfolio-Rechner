@@ -1,8 +1,16 @@
-import PortfolioDataProvider from '../../Data/PortfolioDataProvider';
+import PortfolioDataProvider from '../../Provider/PortfolioDataProvider';
+import FeatureProvider from '../../Provider/FeatureProvider';
 
 
 function AccountUsage() {
+  let featureProvider = new FeatureProvider();
+
+  if (!featureProvider.isFeatureActive(featureProvider.accountUsage)) {
+    return null;
+  }
+
   let portfolioDataProvider = new PortfolioDataProvider();
+
 
   let data = portfolioDataProvider.getPortfolioItemsOrderedByCurrentValue();
   

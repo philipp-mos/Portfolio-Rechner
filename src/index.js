@@ -6,6 +6,7 @@ import Rebalancing from './Components/Rebalancing/Rebalancing';
 import ExemptionOrder from './Components/ExemptionOrder/ExemptionOrder';
 import MonthlyExpenses from './Components/MonthlyExpenses/MonthlyExpenses';
 import AccountUsage from './Components/AccountUsage/AccountUsage';
+import PensionOverview from './Components/PensionOverview/PensionOverview';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -16,8 +17,8 @@ root.render(
           <h1>Portfolio-Rechner</h1>
         </div>
       </div>
-
       <React.StrictMode>
+        <PensionOverview />
         <Rebalancing />
         <ExemptionOrder />
         <MonthlyExpenses />

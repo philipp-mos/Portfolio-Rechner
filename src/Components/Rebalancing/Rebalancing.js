@@ -1,9 +1,17 @@
-import PortfolioDataProvider from '../../Data/PortfolioDataProvider';
+import PortfolioDataProvider from '../../Provider/PortfolioDataProvider';
 import { FormatPriceValue, FormatFloatValue } from '../../Helper/NumberHelper';
 import { getMonthDifference } from '../../Helper/DateHelper';
+import FeatureProvider from '../../Provider/FeatureProvider';
 
 
 function Rebalancing() {
+  let featureProvider = new FeatureProvider();
+
+  if (!featureProvider.isFeatureActive(featureProvider.rebalancing)) {
+    return null;
+  }
+
+  
   let portfolioDataProvider = new PortfolioDataProvider();
 
   let data = portfolioDataProvider.getAll();
@@ -24,6 +32,8 @@ function Rebalancing() {
 
   let targetGoalAmountOfMonths = getMonthDifference(new Date(), new Date(data.goalReachDate));
   let targetGoalMonthlySavings = (data.goalAmount - totalAssets) / targetGoalAmountOfMonths;
+
+  let availableMoney = data.monthlyIncome - monthlySavings - portfolioDataProvider.getExpensesTotalAmount();
   
   
   return (
@@ -31,9 +41,10 @@ function Rebalancing() {
         <div class="col-12">
           <h3>Rebalancing-Übersicht:</h3>
           <div><span class="fw-bold">Assets Gesamt:</span> {FormatPriceValue(totalAssets)}</div>
-          <div><span class="fw-bold">Monatliche Sparrate:</span> {FormatPriceValue(monthlySavings)}</div>
           <div><span class="fw-bold">Zielbetrag:</span> {FormatPriceValue(data.goalAmount)}</div>
+          <div><span class="fw-bold">Monatliche Sparrate:</span> {FormatPriceValue(monthlySavings)}</div>
           <div><span class="fw-bold">Monatliche Zielsparsumme ({targetGoalAmountOfMonths} Monate):</span> {FormatPriceValue(targetGoalMonthlySavings)}</div>
+          <div><span class="fw-bold">Rest verfügbar von Gehalt:</span> {FormatPriceValue(availableMoney)}</div>
           <div><span class="fw-bold">Prozentangabe:</span> {totalPercentage} %</div>
 
 
@@ -73,7 +84,7 @@ function Rebalancing() {
                 }
 
                 let monthlyTarget = '-';
-                if (item.monthlySavings !== null) {
+                if (item.monthlySavings != null) {
                   monthlyTarget = FormatPriceValue(targetGoalMonthlySavings * (item.targetPercentage / 100));
                 }
 

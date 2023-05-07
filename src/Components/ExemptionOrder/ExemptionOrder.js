@@ -1,9 +1,17 @@
 import { FormatPriceValue } from '../../Helper/NumberHelper';
-import PortfolioDataProvider from '../../Data/PortfolioDataProvider';
+import PortfolioDataProvider from '../../Provider/PortfolioDataProvider';
+import FeatureProvider from '../../Provider/FeatureProvider';
 
 
 
 function ExemptionOrder() {
+  let featureProvider = new FeatureProvider();
+
+  if (!featureProvider.isFeatureActive(featureProvider.exemptionOrder)) {
+    return null;
+  }
+
+  
   let portfolioDataProvider = new PortfolioDataProvider();
 
   let exemptionOrderTotal = 0;

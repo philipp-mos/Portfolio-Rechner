@@ -1,4 +1,11 @@
 {
+    "featureActivation": {
+        "accountUsage": true,
+        "exemptionOrder": true,
+        "monthlyExpenses": true,
+        "pensionOverview": true,
+        "rebalancing": true
+    },
     "savingYearlyInterest": 0,
     "birthYear": 0,
     "finalAge": 0,
@@ -44,6 +51,15 @@
             "amount": 0,
             "dueDay": 1
         }
-    ]
-
+    ],    
+    "pension": {
+        "birthYear": 0,
+        "finalAge": 0,
+        "monthlyPension": 0,
+        "averagePerformance": 0.00,
+        "privateInsurance": 0,
+        "legalPension": 0,
+        "monthlySavingRate": 0,
+        "requiredBalance": 0
+    }
 }

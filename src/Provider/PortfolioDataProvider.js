@@ -1,9 +1,7 @@
-import portfolioData from '../data.json';
+import portfolioData from '../data/data.json';
 
 export default class PortfolioDataProvider {
-    getAll = () => {
-        return portfolioData;
-    }
+    getAll = () => portfolioData;
 
     getRelevantPortfolioItemsOrdered = () => {
         return portfolioData.portfolioItems
@@ -44,7 +42,21 @@ export default class PortfolioDataProvider {
         return portfolioData.expenses;
     }
 
+    getExpensesTotalAmount() {
+        var amount = 0;
+
+        portfolioData.expenses.forEach((expense) => {
+            amount += expense.amount;
+        });
+
+        return amount;
+    }
+
     getMonthlyIncome() {
         return portfolioData.monthlyIncome;
+    }
+
+    getPensionConfig() {
+        return portfolioData.pension;
     }
 }
